@@ -1,0 +1,35 @@
+#!/bin/sh
+# shirOS — habilita los servicios systemd que necesita el sistema.
+# Corre dentro del chroot durante `lb build`.
+
+set -e
+
+echo "I: shirOS — enabling systemd services"
+
+# Display manager
+systemctl enable lightdm.service
+
+# Networking
+systemctl enable NetworkManager.service
+systemctl enable wpa_supplicant.service || true
+
+# Service discovery (impresoras, etc.)
+systemctl enable avahi-daemon.service
+
+# Bluetooth
+systemctl enable bluetooth.service
+
+# Print server
+systemctl enable cups.service
+systemctl enable cups-browsed.service
+
+# Auto-updates de seguridad
+systemctl enable unattended-upgrades.service || true
+
+# Time sync
+systemctl enable systemd-timesyncd.service
+
+# Disable cosas que no usamos (reducen boot time)
+systemctl disable apt-daily.service || true
+systemctl disable apt-daily-upgrade.service || true
+systemctl mask plymouth-quit-wait.service || true

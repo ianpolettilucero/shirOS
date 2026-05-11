@@ -1,0 +1,16 @@
+# shirOS — fonts
+# Tipografías sistema + compat MS Office.
+
+fonts-inter
+fonts-jetbrains-mono
+fonts-noto
+fonts-noto-cjk
+fonts-noto-color-emoji
+fonts-noto-mono
+fonts-dejavu
+fonts-liberation
+fonts-liberation2
+fonts-cantarell
+
+# MS fonts (Arial, Times, Courier, Verdana, ...) — para compat docx
+ttf-mscorefonts-installer

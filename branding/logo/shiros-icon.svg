@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="shirOS icon">
+  <title>shirOS icon</title>
+
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="#F5F5F5" stroke="#E5E7EB" stroke-width="2"/>
+
+  <!-- Cat head -->
+  <g transform="translate(64, 70)">
+    <!-- Ears -->
+    <path d="M -36,-14 L -22,-44 L -8,-18 Z" fill="#374151"/>
+    <path d="M  36,-14 L  22,-44 L  8,-18 Z" fill="#374151"/>
+    <!-- Inner ear -->
+    <path d="M -29,-18 L -22,-34 L -14,-19 Z" fill="#9CA3AF"/>
+    <path d="M  29,-18 L  22,-34 L  14,-19 Z" fill="#9CA3AF"/>
+    <!-- Head -->
+    <ellipse cx="0" cy="0" rx="34" ry="30" fill="#374151"/>
+    <!-- White chest -->
+    <path d="M -12,22 Q 0,34 12,22 L 12,8 Q 0,14 -12,8 Z" fill="#F5F5F5"/>
+    <!-- Eyes -->
+    <ellipse cx="-12" cy="-4" rx="3.5" ry="6" fill="#F5F5F5"/>
+    <ellipse cx="12"  cy="-4" rx="3.5" ry="6" fill="#F5F5F5"/>
+    <ellipse cx="-12" cy="-3" rx="1.8" ry="4" fill="#1F2937"/>
+    <ellipse cx="12"  cy="-3" rx="1.8" ry="4" fill="#1F2937"/>
+    <!-- Nose -->
+    <path d="M -3,10 L 3,10 L 0,14 Z" fill="#F5F5F5"/>
+    <!-- Whiskers -->
+    <g stroke="#F5F5F5" stroke-width="1" stroke-linecap="round">
+      <line x1="-32" y1="10" x2="-18" y2="11"/>
+      <line x1="-32" y1="14" x2="-18" y2="14"/>
+      <line x1="32"  y1="10" x2="18"  y2="11"/>
+      <line x1="32"  y1="14" x2="18"  y2="14"/>
+    </g>
+  </g>
+</svg>

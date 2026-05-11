@@ -1,0 +1,47 @@
+#!/bin/bash
+# shirOS — Menú rápido de display (estilo Win+P).
+# Triggered por Super+P o tecla XF86Display.
+
+set -u
+
+# Detectar outputs conectados
+mapfile -t OUTPUTS < <(xrandr --query | awk '/ connected/ {print $1}')
+
+if [ ${#OUTPUTS[@]} -lt 2 ]; then
+    notify-send "shirOS" "Solo hay un monitor conectado." -i video-display
+    exit 0
+fi
+
+PRIMARY="${OUTPUTS[0]}"
+SECONDARY="${OUTPUTS[1]}"
+
+CHOICE=$(zenity --list --title="Configuración de pantallas" \
+    --text="Modo de visualización" \
+    --column="Modo" --column="Descripción" \
+    "extender" "Extender hacia la derecha (recomendado)" \
+    "duplicar" "Duplicar la misma imagen en ambas" \
+    "solo-interno" "Solo el monitor de la laptop (${PRIMARY})" \
+    "solo-externo" "Solo el monitor externo (${SECONDARY})" \
+    --width=480 --height=320 2>/dev/null) || exit 0
+
+case "${CHOICE}" in
+    extender)
+        xrandr --output "${PRIMARY}" --auto --primary \
+               --output "${SECONDARY}" --auto --right-of "${PRIMARY}"
+        ;;
+    duplicar)
+        xrandr --output "${PRIMARY}" --auto --primary \
+               --output "${SECONDARY}" --auto --same-as "${PRIMARY}"
+        ;;
+    solo-interno)
+        xrandr --output "${PRIMARY}" --auto --primary \
+               --output "${SECONDARY}" --off
+        ;;
+    solo-externo)
+        xrandr --output "${SECONDARY}" --auto --primary \
+               --output "${PRIMARY}" --off
+        ;;
+esac
+
+# Guardar como preferencia para esta combinación de monitores
+shiros-monitor-autosetup --save 2>/dev/null || true

@@ -1,0 +1,4 @@
+# shirOS — re-aplica setup multi-monitor al hot-plug de HDMI/DP/VGA.
+# Triggered cuando se conecta o desconecta una salida de video.
+
+ACTION=="change", SUBSYSTEM=="drm", ENV{HOTPLUG}=="1", RUN+="/usr/bin/shiros-monitor-autosetup --udev-trigger"

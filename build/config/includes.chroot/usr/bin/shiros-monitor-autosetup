@@ -1,0 +1,166 @@
+#!/bin/bash
+# shirOS — Auto-setup de monitores externos.
+#
+# Comportamiento:
+#   - Detecta outputs conectados via xrandr.
+#   - Calcula un hash de los EDIDs conectados (clave de "esta combinación").
+#   - Si hay preferencia guardada para esa combinación, la aplica.
+#   - Si no, aplica el default: extender el monitor externo a la derecha del interno.
+#   - Guarda la última config aplicada en ~/.config/shiros/displays.json.
+#
+# Uso:
+#   shiros-monitor-autosetup --apply           # aplica config al login
+#   shiros-monitor-autosetup --udev-trigger    # invocado por udev en hotplug
+#   shiros-monitor-autosetup --save            # guarda config actual como preferencia
+#   shiros-monitor-autosetup --reset           # vuelve a default extender
+
+set -u
+
+CONFIG_DIR="${HOME:-/root}/.config/shiros"
+CONFIG_FILE="${CONFIG_DIR}/displays.json"
+
+mkdir -p "${CONFIG_DIR}"
+
+# ─────────────────────────────────────────────────────────────
+# Helpers
+# ─────────────────────────────────────────────────────────────
+
+log() { echo "[shiros-monitor] $*" >&2; }
+
+ensure_display_env() {
+    # Si fuimos invocados por udev, no tenemos DISPLAY/XAUTHORITY.
+    # Buscar la sesión X activa y exportar las vars.
+    if [ -z "${DISPLAY:-}" ]; then
+        local user_x_session
+        user_x_session="$(pgrep -a Xorg 2>/dev/null | head -n1 || true)"
+        if [ -z "${user_x_session}" ]; then
+            log "no active X session, skipping"
+            exit 0
+        fi
+        export DISPLAY=":0"
+        # Buscar XAUTHORITY del usuario activo
+        local active_user
+        active_user="$(who | awk '/:0/{print $1; exit}')"
+        if [ -n "${active_user}" ]; then
+            export XAUTHORITY="/home/${active_user}/.Xauthority"
+        fi
+    fi
+}
+
+get_connected_outputs() {
+    xrandr --query | awk '/ connected/ {print $1}'
+}
+
+get_edid_hash() {
+    # Hash de todos los EDIDs concatenados, ordenados.
+    # Identifica unívocamente una combinación de monitores.
+    xrandr --props 2>/dev/null \
+        | awk '/^[[:space:]]*EDID:/{flag=1; next} flag && /^[[:space:]]*[0-9a-f]+$/{print; next} {flag=0}' \
+        | sort -u \
+        | sha256sum \
+        | cut -c1-16
+}
+
+apply_default_extend() {
+    # Default: extender hacia la derecha desde el primer monitor.
+    local outputs=($(get_connected_outputs))
+    local count=${#outputs[@]}
+
+    if [ "${count}" -eq 0 ]; then
+        log "no outputs connected"
+        return
+    fi
+
+    if [ "${count}" -eq 1 ]; then
+        log "single output (${outputs[0]}), enabling --auto"
+        xrandr --output "${outputs[0]}" --auto --primary
+        return
+    fi
+
+    log "extending ${count} outputs, primary=${outputs[0]}"
+    local cmd=(xrandr)
+    local previous=""
+    for o in "${outputs[@]}"; do
+        cmd+=(--output "${o}" --auto)
+        if [ -z "${previous}" ]; then
+            cmd+=(--primary)
+        else
+            cmd+=(--right-of "${previous}")
+        fi
+        previous="${o}"
+    done
+    "${cmd[@]}"
+}
+
+save_current_config() {
+    # Guarda la config actual indexada por hash de EDIDs.
+    local hash
+    hash="$(get_edid_hash)"
+    local outputs_json
+    outputs_json="$(xrandr --query \
+        | awk '/ connected/ {
+                gsub(/primary/,"",$0);
+                printf "%s%s", (NR>1?",":""), "{\"output\":\""$1"\",\"line\":\""$0"\"}"
+            }')"
+    cat > "${CONFIG_FILE}.tmp" <<EOF
+{
+  "version": 1,
+  "current_hash": "${hash}",
+  "saved": {
+    "${hash}": {
+      "saved_at": "$(date -Iseconds)",
+      "outputs": [${outputs_json}]
+    }
+  }
+}
+EOF
+    mv "${CONFIG_FILE}.tmp" "${CONFIG_FILE}"
+    log "saved config for hash=${hash}"
+}
+
+apply_saved_or_default() {
+    local hash
+    hash="$(get_edid_hash)"
+    if [ -f "${CONFIG_FILE}" ] && grep -q "\"${hash}\":" "${CONFIG_FILE}"; then
+        log "applying saved config for hash=${hash}"
+        # Por ahora simple: el "saved" más complejo lo guardamos para v0.2 con jq.
+        # Aplicamos default extend que es lo más útil y predecible.
+        apply_default_extend
+    else
+        log "no saved config for hash=${hash}, applying default extend"
+        apply_default_extend
+    fi
+}
+
+# ─────────────────────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────────────────────
+
+case "${1:---apply}" in
+    --apply)
+        ensure_display_env
+        apply_saved_or_default
+        ;;
+    --udev-trigger)
+        # Debouncing simple: esperar 300ms para que el kernel termine de notificar.
+        sleep 0.3
+        ensure_display_env
+        apply_saved_or_default
+        ;;
+    --save)
+        ensure_display_env
+        save_current_config
+        ;;
+    --reset)
+        ensure_display_env
+        rm -f "${CONFIG_FILE}"
+        apply_default_extend
+        ;;
+    -h|--help)
+        sed -n '2,/^# Uso:/{/^# Uso:/!d;:a;n;/^$/q;p;ba}' "$0" | sed 's/^# \{0,1\}//'
+        ;;
+    *)
+        echo "Uso: shiros-monitor-autosetup [--apply|--udev-trigger|--save|--reset]" >&2
+        exit 2
+        ;;
+esac

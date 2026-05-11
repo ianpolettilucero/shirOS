@@ -1,0 +1,95 @@
+#!/bin/bash
+# shirOS — Welcome wizard de primer inicio.
+# Se autoinicia 1 vez después de la instalación.
+
+set -u
+
+MARKER="${HOME}/.config/shiros/.welcome-shown"
+mkdir -p "$(dirname "${MARKER}")"
+
+# Skip si ya se mostró y se invocó automáticamente
+if [ "${1:-}" = "--first-boot" ] && [ -f "${MARKER}" ]; then
+    exit 0
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla 1: Bienvenida
+# ─────────────────────────────────────────────────────────────
+zenity --info \
+    --title="Bienvenido a shirOS" \
+    --text="<big><b>¡Bienvenido a shirOS!</b></big>\n\nUn sistema simple, rápido y compatible.\n\nVamos a configurar lo básico en unos pocos pasos." \
+    --width=520 \
+    --ok-label="Comenzar" 2>/dev/null || { touch "${MARKER}"; exit 0; }
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla 2: Conexión WiFi (si no está conectado)
+# ─────────────────────────────────────────────────────────────
+if ! nmcli -t -f STATE general | grep -q connected; then
+    if zenity --question --title="Conexión a internet" \
+        --text="No hay conexión a internet activa.\n\n¿Querés configurar el WiFi ahora?" \
+        --width=480 2>/dev/null; then
+        nm-connection-editor &
+        zenity --info --title="WiFi" \
+            --text="Una vez conectado, presioná Aceptar para continuar." \
+            --width=420 2>/dev/null || true
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla 3: Apps adicionales
+# ─────────────────────────────────────────────────────────────
+APPS=$(zenity --list --checklist \
+    --title="Apps adicionales" \
+    --text="Marcá las apps que querés instalar. Podés instalar más después desde el centro de software." \
+    --column="Instalar" --column="App" --column="Descripción" \
+    FALSE "google-chrome" "Google Chrome (necesario para algunas web apps corporativas)" \
+    FALSE "zoom" "Zoom (videollamadas)" \
+    FALSE "slack" "Slack (mensajería corporativa)" \
+    FALSE "teams" "Microsoft Teams" \
+    FALSE "rustdesk" "RustDesk (soporte remoto IT)" \
+    FALSE "onlyoffice" "OnlyOffice (alternativa offline a MS Office)" \
+    --width=620 --height=420 --separator=" " 2>/dev/null) || APPS=""
+
+if [ -n "${APPS}" ]; then
+    (
+        echo "10" ; echo "# Preparando..."
+        sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null
+        local_progress=20
+        for app in ${APPS}; do
+            case "${app}" in
+                google-chrome) flatpak_id="com.google.Chrome" ;;
+                zoom) flatpak_id="us.zoom.Zoom" ;;
+                slack) flatpak_id="com.slack.Slack" ;;
+                teams) flatpak_id="com.github.IsmaelMartinez.teams_for_linux" ;;
+                rustdesk) flatpak_id="com.rustdesk.RustDesk" ;;
+                onlyoffice) flatpak_id="org.onlyoffice.desktopeditors" ;;
+                *) continue ;;
+            esac
+            echo "${local_progress}" ; echo "# Instalando ${app}..."
+            sudo flatpak install -y flathub "${flatpak_id}" 2>&1 | grep -v '^$' >&2 || true
+            local_progress=$((local_progress + 15))
+        done
+        echo "100" ; echo "# Listo"
+    ) | zenity --progress --title="Instalando apps" --width=480 --auto-close 2>/dev/null || true
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla 4: Configurar pantallas adicionales
+# ─────────────────────────────────────────────────────────────
+N_OUTPUTS=$(xrandr --query | grep -c " connected" || echo 0)
+if [ "${N_OUTPUTS}" -gt 1 ]; then
+    zenity --info \
+        --title="Pantallas detectadas" \
+        --text="Se detectaron <b>${N_OUTPUTS} pantallas</b>.\n\nConfiguré las pantallas en modo <b>extendido</b> por default.\n\nPodés cambiarlo en cualquier momento con <b>Super+P</b> o desde Configuración → Pantallas." \
+        --width=480 2>/dev/null || true
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla final
+# ─────────────────────────────────────────────────────────────
+zenity --info \
+    --title="Listo" \
+    --text="<big><b>¡Todo listo!</b></big>\n\nshirOS está configurado.\n\nAtajos útiles:\n  • <b>Super</b> = Menú\n  • <b>Super+E</b> = Archivos\n  • <b>Super+T</b> = Terminal\n  • <b>Super+P</b> = Pantallas\n  • <b>Super+L</b> = Bloquear\n\nDisfrutalo." \
+    --width=480 2>/dev/null || true
+
+touch "${MARKER}"

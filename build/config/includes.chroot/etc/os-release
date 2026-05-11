@@ -1,0 +1,11 @@
+PRETTY_NAME="shirOS 0.1.0 (Shir)"
+NAME="shirOS"
+VERSION_ID="0.1.0"
+VERSION="0.1.0 (Shir)"
+VERSION_CODENAME=shir
+ID=shiros
+ID_LIKE=debian
+HOME_URL="https://github.com/ianpolettilucero/shiros"
+SUPPORT_URL="https://github.com/ianpolettilucero/shiros/issues"
+BUG_REPORT_URL="https://github.com/ianpolettilucero/shiros/issues"
+LOGO=shiros-logo

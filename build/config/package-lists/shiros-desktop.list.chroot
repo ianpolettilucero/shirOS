@@ -1,0 +1,70 @@
+# shirOS — XFCE desktop stack
+# Display server, session, panel, file manager, basic theming.
+
+# X server
+xorg
+xserver-xorg-input-libinput
+xserver-xorg-video-all
+
+# XFCE core
+xfce4
+xfce4-session
+xfce4-panel
+xfce4-settings
+xfwm4
+xfdesktop4
+xfce4-appfinder
+xfce4-notifyd
+xfce4-power-manager
+xfce4-screensaver
+xfce4-screenshooter
+xfce4-taskmanager
+xfce4-terminal
+xfce4-whiskermenu-plugin
+xfce4-pulseaudio-plugin
+xfce4-clipman-plugin
+xfce4-cpugraph-plugin
+xfce4-systemload-plugin
+xfce4-weather-plugin
+
+# file manager
+thunar
+thunar-archive-plugin
+thunar-volman
+thunar-media-tags-plugin
+
+# display manager
+lightdm
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
+
+# polkit / authentication
+policykit-1-gnome
+
+# bluetooth
+bluez
+blueman
+
+# audio mixer GUI
+pavucontrol
+
+# tray / notifications
+libnotify-bin
+notification-daemon
+xdg-utils
+xdg-user-dirs
+xdg-user-dirs-gtk
+
+# multi-monitor
+arandr
+autorandr
+
+# themes & assets
+arc-theme
+papirus-icon-theme
+adwaita-icon-theme
+hicolor-icon-theme
+gtk2-engines-murrine
+gtk2-engines-pixbuf
+plymouth
+plymouth-themes

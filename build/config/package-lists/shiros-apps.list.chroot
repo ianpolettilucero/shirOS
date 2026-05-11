@@ -1,0 +1,60 @@
+# shirOS — user-facing applications
+# Browser, mail, editor, viewers, basic productivity.
+
+# Browser principal
+firefox-esr
+firefox-esr-l10n-es-ar
+
+# Mail
+thunderbird
+thunderbird-l10n-es-ar
+
+# Text editor
+mousepad
+
+# Image viewer
+ristretto
+
+# PDF viewer
+evince
+
+# Archive manager
+xarchiver
+
+# Disk tools
+gnome-disk-utility
+gparted
+
+# Printing
+system-config-printer
+cups
+cups-browsed
+printer-driver-all
+hplip
+hplip-gui
+sane
+sane-utils
+simple-scan
+
+# Screenshots
+gnome-screenshot
+
+# Calculator
+galculator
+
+# Soft store (para que el usuario instale apps extra)
+flatpak
+gnome-software
+gnome-software-plugin-flatpak
+
+# Firewall GUI
+gufw
+
+# System snapshots (rollback de updates)
+timeshift
+
+# Calendar
+gnome-calendar
+
+# Webcam test
+cheese

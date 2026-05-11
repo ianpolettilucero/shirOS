@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Bienvenido a shirOS
+GenericName=Welcome
+Comment=Wizard de configuración inicial
+Exec=/usr/bin/shiros-welcome
+Icon=shiros-logo
+Terminal=false
+Categories=System;Settings;
+Keywords=welcome;help;setup;

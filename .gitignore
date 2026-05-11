@@ -1,0 +1,51 @@
+# live-build output
+build/auto/.lb
+build/.build/
+build/binary/
+build/cache/
+build/chroot/
+build/config/binary
+build/config/bootstrap
+build/config/build
+build/config/chroot
+build/config/common
+build/config/source
+build/local/
+build/*.iso
+build/*.img
+build/*.log
+build/*.contents
+build/*.files
+build/*.list
+build/*.packages
+build/*.packages.live
+build/binary.hybrid.iso.zsync
+build/source.debian.tar.*
+build/source.iso
+
+# ISOs at root
+*.iso
+*.iso.sig
+*.iso.sha256
+
+# Editor / OS junk
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Generated assets
+branding/**/*.png.cache
+branding/plymouth/shiros/*.script.compiled
+
+# Python (if scripts use venvs)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# QEMU test artifacts
+*.qcow2
+test-disk.img

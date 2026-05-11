@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=shirOS Monitor Autosetup
+Comment=Restaura la configuración de monitores al iniciar sesión
+Exec=/usr/bin/shiros-monitor-autosetup --apply
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

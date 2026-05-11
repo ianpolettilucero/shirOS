@@ -1,0 +1,7 @@
+#!/bin/sh
+# shirOS — live-build wrapper
+# Invocado por `lb build`. Loguea a build.log para debug.
+
+set -e
+
+lb build noauto "${@}" 2>&1 | tee build.log

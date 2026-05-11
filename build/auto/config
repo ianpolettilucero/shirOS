@@ -1,0 +1,40 @@
+#!/bin/sh
+# shirOS — live-build config
+# Invocado por `lb config`. Define todos los parámetros de build.
+
+set -e
+
+SHIROS_VERSION="${SHIROS_VERSION:-0.1.0-shir}"
+SHIROS_ARCH="${SHIROS_ARCH:-amd64}"
+SHIROS_DIST="${SHIROS_DIST:-bookworm}"
+
+lb config noauto \
+    --mode debian \
+    --distribution "${SHIROS_DIST}" \
+    --distribution-binary "${SHIROS_DIST}" \
+    --distribution-chroot "${SHIROS_DIST}" \
+    --architectures "${SHIROS_ARCH}" \
+    --linux-flavours "${SHIROS_ARCH}" \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --parent-archive-areas "main contrib non-free non-free-firmware" \
+    --debian-installer false \
+    --memtest none \
+    --apt-recommends false \
+    --apt-indices false \
+    --backports true \
+    --updates true \
+    --security true \
+    --binary-images iso-hybrid \
+    --bootloaders "grub-efi,grub-pc" \
+    --uefi-secure-boot enable \
+    --iso-application "shirOS" \
+    --iso-publisher "shirOS Project; https://github.com/ianpolettilucero/shiros" \
+    --iso-volume "shirOS ${SHIROS_VERSION}" \
+    --image-name "shiros-${SHIROS_VERSION}-${SHIROS_ARCH}" \
+    --bootappend-live "boot=live components quiet splash username=live hostname=shiros locales=es_AR.UTF-8 keyboard-layouts=latam timezone=America/Argentina/Buenos_Aires" \
+    --bootappend-live-failsafe "boot=live components noquiet noeject" \
+    --firmware-binary true \
+    --firmware-chroot true \
+    --win32-loader false \
+    --zsync false \
+    "${@}"

@@ -1,0 +1,20 @@
+# shirOS — installer
+# Calamares + dependencias para que el wizard funcione en live session.
+
+calamares
+calamares-settings-debian
+qml-module-qtquick2
+qml-module-qtquick-controls
+qml-module-qtquick-controls2
+qml-module-qtquick-layouts
+qml-module-qtquick-window2
+squashfs-tools
+rsync
+dosfstools
+btrfs-progs
+xfsprogs
+os-prober
+grub-efi-amd64-signed
+grub-pc-bin
+shim-signed
+efibootmgr

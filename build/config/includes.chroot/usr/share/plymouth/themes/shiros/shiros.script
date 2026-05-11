@@ -1,0 +1,59 @@
+# shirOS Plymouth boot splash — script theme.
+# Logo centered + 3 pulsating dots underneath.
+
+# ── Background ──
+Window.SetBackgroundTopColor(0.122, 0.161, 0.216);    # #1F2937
+Window.SetBackgroundBottomColor(0.067, 0.094, 0.153); # #111827
+
+# ── Logo ──
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(Window.GetWidth()/2 - logo.image.GetWidth()/2);
+logo.sprite.SetY(Window.GetHeight()/2 - logo.image.GetHeight()/2 - 30);
+
+# ── 3 dots ──
+fun dot_image (alpha) {
+    return Image.Text(".", 1, 1, 1, alpha, "Sans Bold 48");
+}
+
+dot1.images = [];
+dot2.images = [];
+dot3.images = [];
+for (i = 0; i < 16; i++) {
+    a = (Math.Sin((i / 16.0) * 2 * 3.14159) + 1) / 2 * 0.9 + 0.1;
+    dot1.images[i] = dot_image(a);
+    dot2.images[i] = dot_image(a);
+    dot3.images[i] = dot_image(a);
+}
+
+dot1.sprite = Sprite();
+dot2.sprite = Sprite();
+dot3.sprite = Sprite();
+
+cx = Window.GetWidth()/2;
+cy = Window.GetHeight()/2 + logo.image.GetHeight()/2 + 60;
+dot1.sprite.SetX(cx - 40); dot1.sprite.SetY(cy);
+dot2.sprite.SetX(cx);      dot2.sprite.SetY(cy);
+dot3.sprite.SetX(cx + 40); dot3.sprite.SetY(cy);
+
+t = 0;
+fun refresh_cb () {
+    t = t + 1;
+    dot1.sprite.SetImage(dot1.images[(t + 0) % 16]);
+    dot2.sprite.SetImage(dot2.images[(t + 5) % 16]);
+    dot3.sprite.SetImage(dot3.images[(t + 10) % 16]);
+}
+
+Plymouth.SetRefreshFunction(refresh_cb);
+
+# ── Password prompt (LUKS) ──
+fun display_password_cb (prompt, bullets) {
+    if (!password_prompt_sprite) {
+        password_prompt_image = Image.Text("🔒 " + prompt + ":", 1, 1, 1, 1, "Sans 16");
+        password_prompt_sprite = Sprite(password_prompt_image);
+        password_prompt_sprite.SetX(Window.GetWidth()/2 - password_prompt_image.GetWidth()/2);
+        password_prompt_sprite.SetY(cy + 80);
+    }
+}
+
+Plymouth.SetDisplayPasswordFunction(display_password_cb);
