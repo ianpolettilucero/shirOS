@@ -1,0 +1,17 @@
+#%PAM-1.0
+# shirOS — override de Debian's lightdm-autologin.
+# El default de Debian exige que el user esté en el grupo 'nopasswdlogin'
+# para permitir autologin sin password. En una sesión live con un user
+# ad-hoc creado por live-config al boot, esa exigencia es la causa más
+# común de "el autologin se ignora y aparece el greeter".
+# Removemos esa línea acá. La PAM stack normal de login (greeter con
+# password) sigue intacta en /etc/pam.d/lightdm — esto solo afecta autologin.
+
+auth    requisite       pam_nologin.so
+auth    required        pam_permit.so
+
+@include lightdm
+
+session optional        pam_gnome_keyring.so auto_start
+session optional        pam_kwallet.so
+session optional        pam_kwallet5.so
