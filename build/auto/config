@@ -25,7 +25,7 @@ lb config noauto \
     --updates true \
     --security true \
     --binary-images iso-hybrid \
-    --bootloaders "grub-efi,grub-pc" \
+    --bootloaders "grub-efi,syslinux" \
     --uefi-secure-boot enable \
     --iso-application "shirOS" \
     --iso-publisher "shirOS Project; https://github.com/ianpolettilucero/shiros" \
