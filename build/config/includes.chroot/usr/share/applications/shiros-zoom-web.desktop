@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Zoom (Web)
+GenericName=Zoom
+Comment=Sumate a una reunión Zoom desde el navegador
+Exec=firefox-esr --new-window https://zoom.us/join
+Icon=zoom
+Terminal=false
+StartupNotify=true
+Categories=Network;Office;
+Keywords=zoom;videollamada;meeting;reuniones;

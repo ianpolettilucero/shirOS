@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#F5F5F7"/>
+      <stop offset="50%"  stop-color="#E5E7EB"/>
+      <stop offset="100%" stop-color="#D1D5DB"/>
+    </linearGradient>
+
+    <radialGradient id="accent" cx="80%" cy="20%" r="60%">
+      <stop offset="0%"   stop-color="#DBEAFE" stop-opacity="0.7"/>
+      <stop offset="60%"  stop-color="#DBEAFE" stop-opacity="0.0"/>
+    </radialGradient>
+
+    <pattern id="dots" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse">
+      <circle cx="24" cy="24" r="1.2" fill="#9CA3AF" fill-opacity="0.18"/>
+    </pattern>
+  </defs>
+
+  <!-- Base gradient -->
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+
+  <!-- Subtle accent glow -->
+  <rect width="1920" height="1080" fill="url(#accent)"/>
+
+  <!-- Dot pattern overlay -->
+  <rect width="1920" height="1080" fill="url(#dots)"/>
+
+  <!-- Subtle geometric cat silhouette (giant, low opacity, decorative) -->
+  <g transform="translate(960, 540)" opacity="0.08">
+    <path d="M -180,-60 L -120,-220 L -50,-80 Z" fill="#374151"/>
+    <path d="M  180,-60 L  120,-220 L  50,-80 Z" fill="#374151"/>
+    <ellipse cx="0" cy="10" rx="170" ry="150" fill="#374151"/>
+  </g>
+
+  <!-- Logo small bottom-right -->
+  <g transform="translate(1640, 1010)" opacity="0.55">
+    <text font-family="Inter, sans-serif" font-weight="700" font-size="22" fill="#374151" letter-spacing="-0.02em">
+      shir<tspan fill="#3B82F6">OS</tspan>
+    </text>
+  </g>
+</svg>

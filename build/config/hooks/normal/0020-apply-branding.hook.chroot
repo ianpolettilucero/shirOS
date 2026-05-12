@@ -1,0 +1,38 @@
+#!/bin/sh
+# shirOS — aplica branding (plymouth, GRUB defaults, alternatives).
+
+set -e
+
+echo "I: shirOS — applying branding"
+
+# Plymouth theme default
+if [ -d /usr/share/plymouth/themes/shiros ]; then
+    plymouth-set-default-theme -R shiros || \
+        echo "W: plymouth-set-default-theme failed (theme will be set on first boot)"
+fi
+
+# GRUB defaults
+if [ -f /etc/default/grub ]; then
+    sed -i 's/^GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="shirOS"/' /etc/default/grub
+    sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=3/' /etc/default/grub
+    sed -i 's|^GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"|' /etc/default/grub
+fi
+
+# Hostname default (será sobrescrito por el instalador)
+echo "shiros-live" > /etc/hostname
+
+# Sound: PipeWire en lugar de PulseAudio
+systemctl --global enable pipewire.service pipewire-pulse.service wireplumber.service || true
+systemctl --global disable pulseaudio.service pulseaudio.socket || true
+
+# GTK default theme global
+mkdir -p /etc/gtk-3.0
+cat > /etc/gtk-3.0/settings.ini <<'EOF'
+[Settings]
+gtk-theme-name=Arc
+gtk-icon-theme-name=Papirus
+gtk-font-name=Inter 10
+gtk-cursor-theme-name=Adwaita
+gtk-application-prefer-dark-theme=false
+gtk-enable-animations=true
+EOF

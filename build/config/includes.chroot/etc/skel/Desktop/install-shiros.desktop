@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Instalar shirOS
+GenericName=System Installer
+Comment=Instala shirOS en este equipo
+Exec=pkexec calamares
+Icon=calamares
+Terminal=false
+Categories=Qt;System;
+StartupNotify=true

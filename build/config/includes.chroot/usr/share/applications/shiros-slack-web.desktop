@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Slack (Web)
+GenericName=Slack
+Comment=Slack en el navegador
+Exec=firefox-esr --new-window https://app.slack.com
+Icon=slack
+Terminal=false
+StartupNotify=true
+Categories=Network;InstantMessaging;Office;
+Keywords=slack;chat;mensajes;canales;

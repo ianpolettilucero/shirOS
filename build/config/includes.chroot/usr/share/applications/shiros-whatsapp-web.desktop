@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=WhatsApp (Web)
+GenericName=WhatsApp
+Comment=WhatsApp Web
+Exec=firefox-esr --new-window https://web.whatsapp.com
+Icon=whatsapp
+Terminal=false
+StartupNotify=true
+Categories=Network;InstantMessaging;
+Keywords=whatsapp;chat;mensajes;

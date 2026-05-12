@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Outlook (Web)
+GenericName=Outlook
+Comment=Outlook 365 en el navegador
+Exec=firefox-esr --new-window https://outlook.office.com
+Icon=microsoft-outlook
+Terminal=false
+StartupNotify=true
+Categories=Network;Office;Email;
+Keywords=outlook;mail;email;correo;office;365;

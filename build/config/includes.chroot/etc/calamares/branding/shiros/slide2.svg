@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <rect width="900" height="500" fill="#F5F5F7"/>
+  <!-- Reloj minimalista -->
+  <g transform="translate(450, 200)">
+    <circle cx="0" cy="0" r="100" fill="#FFFFFF" stroke="#374151" stroke-width="4"/>
+    <line x1="0" y1="0" x2="0" y2="-70" stroke="#374151" stroke-width="6" stroke-linecap="round"/>
+    <line x1="0" y1="0" x2="50" y2="0" stroke="#3B82F6" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="0" cy="0" r="6" fill="#374151"/>
+    <!-- 12, 3, 6, 9 markers -->
+    <text x="0" y="-78" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="14" fill="#374151" dy="0.3em">12</text>
+    <text x="78" y="0" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="14" fill="#374151" dy="0.3em">3</text>
+    <text x="0" y="78" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="14" fill="#374151" dy="0.3em">6</text>
+    <text x="-78" y="0" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="14" fill="#374151" dy="0.3em">9</text>
+  </g>
+</svg>

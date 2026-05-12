@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Office 365
+GenericName=Office 365
+Comment=Word, Excel, PowerPoint, OneDrive — en el navegador
+Exec=firefox-esr --new-window https://www.office.com
+Icon=ms-office
+Terminal=false
+StartupNotify=true
+Categories=Office;
+Keywords=office;365;word;excel;powerpoint;onedrive;

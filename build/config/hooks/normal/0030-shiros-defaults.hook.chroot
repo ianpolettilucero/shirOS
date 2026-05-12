@@ -1,0 +1,43 @@
+#!/bin/sh
+# shirOS — defaults regionales y de sistema.
+
+set -e
+
+echo "I: shirOS — applying regional defaults"
+
+# Locale es_AR.UTF-8
+sed -i 's/^# *es_AR.UTF-8/es_AR.UTF-8/' /etc/locale.gen
+sed -i 's/^# *en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
+locale-gen
+echo "LANG=es_AR.UTF-8" > /etc/default/locale
+
+# Timezone Argentina
+echo "America/Argentina/Buenos_Aires" > /etc/timezone
+ln -sf /usr/share/zoneinfo/America/Argentina/Buenos_Aires /etc/localtime
+dpkg-reconfigure -f noninteractive tzdata
+
+# Keyboard layout latam
+cat > /etc/default/keyboard <<'EOF'
+XKBMODEL="pc105"
+XKBLAYOUT="latam"
+XKBVARIANT=""
+XKBOPTIONS=""
+BACKSPACE="guess"
+EOF
+
+# Hostname / machine info
+mkdir -p /etc/systemd
+cat > /etc/machine-info <<'EOF'
+PRETTY_HOSTNAME="shirOS"
+ICON_NAME=computer-laptop
+CHASSIS=laptop
+EOF
+
+# Permitir wheel/sudo sin password en live (solo live, el instalador define el real)
+# Esto está OK porque la live no persiste
+
+# Asegurar que los scripts custom son ejecutables
+chmod +x /usr/bin/shiros-* 2>/dev/null || true
+
+# Crear dir de config de shirOS
+mkdir -p /etc/skel/.config/shiros

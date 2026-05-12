@@ -1,0 +1,43 @@
+[Unit]
+Description=shirOS — escaneo semanal con ClamAV
+Documentation=https://github.com/ianpolettilucero/shiros/blob/main/docs/decisions/0003-default-apps.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+
+# Prioridad baja: no debe afectar al usuario.
+Nice=19
+IOSchedulingClass=idle
+CPUSchedulingPolicy=idle
+
+# Timeout amplio (laptops viejas pueden tardar)
+TimeoutStartSec=4h
+
+# Refrescar firmas antes de escanear (idempotente, freshclam decide).
+ExecStartPre=-/usr/bin/freshclam --quiet --no-warnings
+
+# Escaneo: home + tmp + downloads. NO sistema (lento e improductivo en Linux).
+# --infected: solo loguea hallazgos.
+# --recursive: descender en subdirs.
+# --exclude-dir: skip pseudo-fs.
+ExecStart=/usr/bin/clamscan \
+    --recursive \
+    --infected \
+    --exclude-dir=^/sys \
+    --exclude-dir=^/proc \
+    --exclude-dir=^/dev \
+    --exclude-dir=^/run \
+    --exclude-dir=^/var/lib/docker \
+    --exclude-dir=^/var/lib/containerd \
+    --exclude-dir=^/var/lib/flatpak \
+    --max-filesize=100M \
+    --max-scansize=400M \
+    /home /tmp /var/tmp
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

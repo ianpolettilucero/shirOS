@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Google Workspace
+GenericName=Google Workspace
+Comment=Docs, Sheets, Slides, Drive, Calendar — en el navegador
+Exec=firefox-esr --new-window https://workspace.google.com
+Icon=google-drive
+Terminal=false
+StartupNotify=true
+Categories=Office;
+Keywords=google;workspace;docs;sheets;slides;drive;calendar;

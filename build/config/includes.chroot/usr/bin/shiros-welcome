@@ -1,0 +1,104 @@
+#!/bin/bash
+# shirOS — Welcome wizard de primer inicio.
+# Se autoinicia 1 vez después de la instalación.
+
+set -u
+
+MARKER="${HOME}/.config/shiros/.welcome-shown"
+mkdir -p "$(dirname "${MARKER}")"
+
+# Skip si ya se mostró y se invocó automáticamente
+if [ "${1:-}" = "--first-boot" ] && [ -f "${MARKER}" ]; then
+    exit 0
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla 1: Bienvenida
+# ─────────────────────────────────────────────────────────────
+zenity --info \
+    --title="Bienvenido a shirOS" \
+    --text="<big><b>¡Bienvenido a shirOS!</b></big>\n\nUn sistema simple, rápido y compatible.\n\nVamos a configurar lo básico en unos pocos pasos." \
+    --width=520 \
+    --ok-label="Comenzar" 2>/dev/null || { touch "${MARKER}"; exit 0; }
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla 2: Conexión WiFi (si no está conectado)
+# ─────────────────────────────────────────────────────────────
+if ! nmcli -t -f STATE general | grep -q connected; then
+    if zenity --question --title="Conexión a internet" \
+        --text="No hay conexión a internet activa.\n\n¿Querés configurar el WiFi ahora?" \
+        --width=480 2>/dev/null; then
+        nm-connection-editor &
+        zenity --info --title="WiFi" \
+            --text="Una vez conectado, presioná Aceptar para continuar." \
+            --width=420 2>/dev/null || true
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla 3: Apps nativas opcionales
+#
+# Por default shirOS no instala apps de comunicación (decisión 0003):
+# usás los Web Launchers del menú (Teams Web, WhatsApp Web, Slack Web,
+# Outlook Web, Office 365, Gmail, Google Workspace, Meet, Zoom Web).
+# Esto mantiene la imagen liviana.
+#
+# Si necesitás un cliente NATIVO (ej. para mejor integración, screen
+# share avanzado, o uso offline), podés instalarlo acá.
+# ─────────────────────────────────────────────────────────────
+APPS=$(zenity --list --checklist \
+    --title="Apps nativas (opcionales)" \
+    --text="Por default usás las apps web (ya tenés accesos directos en el menú).\n\nSi necesitás clientes <b>nativos</b> (mejor integración, screen share, uso offline), marcalos acá.\n\nPodés instalar más después desde el centro de software." \
+    --column="Instalar" --column="App" --column="Descripción" \
+    FALSE "brave"      "Brave Browser (Chromium con privacy, alternativa a Firefox)" \
+    FALSE "chrome"     "Google Chrome (cuando una web app corporativa exige Chrome)" \
+    FALSE "zoom"       "Zoom desktop (mejor calidad de video y screen share)" \
+    FALSE "slack"      "Slack desktop (notificaciones nativas)" \
+    FALSE "teams"      "Microsoft Teams desktop" \
+    FALSE "onlyoffice" "OnlyOffice (suite offline compatible con .docx/.xlsx/.pptx)" \
+    --width=680 --height=460 --separator=" " 2>/dev/null) || APPS=""
+
+if [ -n "${APPS}" ]; then
+    (
+        echo "5" ; echo "# Preparando Flatpak..."
+        sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null
+        local_progress=10
+        for app in ${APPS}; do
+            case "${app}" in
+                brave)      flatpak_id="com.brave.Browser" ;;
+                chrome)     flatpak_id="com.google.Chrome" ;;
+                zoom)       flatpak_id="us.zoom.Zoom" ;;
+                slack)      flatpak_id="com.slack.Slack" ;;
+                teams)      flatpak_id="com.github.IsmaelMartinez.teams_for_linux" ;;
+                onlyoffice) flatpak_id="org.onlyoffice.desktopeditors" ;;
+                *)          continue ;;
+            esac
+            echo "${local_progress}" ; echo "# Instalando ${app}..."
+            sudo flatpak install -y flathub "${flatpak_id}" 2>&1 | grep -v '^$' >&2 || true
+            local_progress=$((local_progress + 15))
+            [ "${local_progress}" -gt 95 ] && local_progress=95
+        done
+        echo "100" ; echo "# Listo"
+    ) | zenity --progress --title="Instalando apps" --width=480 --auto-close 2>/dev/null || true
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla 4: Configurar pantallas adicionales
+# ─────────────────────────────────────────────────────────────
+N_OUTPUTS=$(xrandr --query | grep -c " connected" || echo 0)
+if [ "${N_OUTPUTS}" -gt 1 ]; then
+    zenity --info \
+        --title="Pantallas detectadas" \
+        --text="Se detectaron <b>${N_OUTPUTS} pantallas</b>.\n\nConfiguré las pantallas en modo <b>extendido</b> por default.\n\nPodés cambiarlo en cualquier momento con <b>Super+P</b> o desde Configuración → Pantallas." \
+        --width=480 2>/dev/null || true
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Pantalla final
+# ─────────────────────────────────────────────────────────────
+zenity --info \
+    --title="Listo" \
+    --text="<big><b>¡Todo listo!</b></big>\n\nshirOS está configurado.\n\n<b>Apps web</b> ya en el menú:\n  Teams · WhatsApp · Slack · Outlook · Office 365\n  Gmail · Google Workspace · Meet · Zoom\n\n<b>Atajos útiles</b>:\n  • <b>Super</b> = Menú\n  • <b>Super+E</b> = Archivos\n  • <b>Super+T</b> = Terminal\n  • <b>Super+P</b> = Pantallas\n  • <b>Super+L</b> = Bloquear\n  • <b>Print</b> = Captura\n\n<i>RustDesk ya está corriendo: pediéndole tu ID al equipo de IT pueden asistirte.</i>\n\nDisfrutalo." \
+    --width=520 2>/dev/null || true
+
+touch "${MARKER}"

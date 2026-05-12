@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-keyboard-shortcuts" version="1.0">
+  <property name="commands" type="empty">
+    <property name="custom" type="empty">
+      <property name="&lt;Super&gt;p" type="string" value="shiros-display-quickmenu"/>
+      <property name="&lt;Super&gt;e" type="string" value="thunar"/>
+      <property name="&lt;Super&gt;l" type="string" value="xflock4"/>
+      <property name="&lt;Super&gt;t" type="string" value="xfce4-terminal"/>
+      <property name="&lt;Super&gt;r" type="string" value="xfce4-appfinder"/>
+      <property name="&lt;Primary&gt;&lt;Alt&gt;t" type="string" value="xfce4-terminal"/>
+      <property name="Print" type="string" value="xfce4-screenshooter"/>
+      <property name="&lt;Alt&gt;Print" type="string" value="xfce4-screenshooter -w"/>
+      <property name="&lt;Shift&gt;Print" type="string" value="xfce4-screenshooter -r"/>
+      <property name="XF86Display" type="string" value="shiros-display-quickmenu"/>
+      <property name="override" type="bool" value="true"/>
+    </property>
+  </property>
+</channel>

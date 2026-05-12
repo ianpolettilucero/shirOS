@@ -1,0 +1,52 @@
+#!/bin/sh
+# shirOS — habilita los servicios systemd que necesita el sistema.
+# Corre dentro del chroot durante `lb build`.
+
+set -e
+
+echo "I: shirOS — enabling systemd services"
+
+# Display manager
+systemctl enable lightdm.service
+
+# Networking
+systemctl enable NetworkManager.service
+systemctl enable wpa_supplicant.service || true
+
+# Service discovery (impresoras, etc.)
+systemctl enable avahi-daemon.service
+
+# Bluetooth
+systemctl enable bluetooth.service
+
+# Print server
+systemctl enable cups.service
+systemctl enable cups-browsed.service
+
+# Auto-updates de seguridad (decisión 0003: solo security, otros notifican)
+systemctl enable unattended-upgrades.service || true
+systemctl enable apt-daily.timer || true
+systemctl enable apt-daily-upgrade.timer || true
+
+# Time sync
+systemctl enable systemd-timesyncd.service
+
+# ClamAV (decisión 0003: scan semanal Lunes 9 AM, low priority)
+# NO habilitamos clamav-daemon (clamd) — sería on-access scan, demasiado pesado.
+# Solo freshclam (signature updates) y nuestro timer custom.
+if dpkg -s clamav-freshclam >/dev/null 2>&1; then
+    systemctl enable clamav-freshclam.service || true
+fi
+if [ -f /etc/systemd/system/shiros-clamav-scan.timer ]; then
+    systemctl enable shiros-clamav-scan.timer || true
+fi
+
+# RustDesk (decisión 0003: preinstalado como servicio para soporte IT remoto).
+# El .deb registra rustdesk.service automáticamente al instalarse via
+# build/config/packages.chroot/. Solo enable-amos si está presente.
+if dpkg -s rustdesk >/dev/null 2>&1; then
+    systemctl enable rustdesk.service || true
+fi
+
+# Disable cosas que no usamos (reducen boot time)
+systemctl mask plymouth-quit-wait.service || true

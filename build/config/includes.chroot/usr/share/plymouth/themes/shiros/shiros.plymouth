@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=shirOS
+Description=shirOS boot splash — minimal monochrome logo
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/shiros
+ScriptFile=/usr/share/plymouth/themes/shiros/shiros.script

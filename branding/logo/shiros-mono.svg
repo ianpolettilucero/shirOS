@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" width="360" height="96" role="img" aria-label="shirOS monochrome">
+  <title>shirOS monochrome</title>
+
+  <g transform="translate(48, 48)" fill="currentColor">
+    <path d="M -30,-10 L -20,-34 L -8,-14 Z"/>
+    <path d="M  30,-10 L  20,-34 L  8,-14 Z"/>
+    <ellipse cx="0" cy="2" rx="28" ry="24"/>
+  </g>
+
+  <text x="100" y="60"
+        font-family="Inter, sans-serif"
+        font-weight="700"
+        font-size="42"
+        letter-spacing="-0.02em"
+        fill="currentColor">shirOS</text>
+</svg>

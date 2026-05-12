@@ -1,0 +1,85 @@
+# shirOS — core system packages
+# Base CLI tools, kernel, init, networking primitives.
+
+# kernel + base
+linux-image-amd64
+linux-headers-amd64
+firmware-linux
+firmware-linux-nonfree
+intel-microcode
+amd64-microcode
+
+# init & service mgmt
+systemd
+systemd-sysv
+dbus
+
+# networking
+network-manager
+network-manager-gnome
+# VPN — los 3 protocolos comunes en corporate AR (decisión 0003)
+network-manager-openvpn-gnome
+network-manager-openconnect-gnome
+network-manager-l2tp-gnome
+wireguard
+wireguard-tools
+openvpn
+openconnect
+wpasupplicant
+iwd
+avahi-daemon
+libnss-mdns
+openssh-client
+
+# storage / filesystems
+ntfs-3g
+exfat-fuse
+exfatprogs
+dosfstools
+e2fsprogs
+gdisk
+parted
+udisks2
+gvfs
+gvfs-backends
+gvfs-fuse
+policykit-1
+
+# system utils (CLI)
+sudo
+bash-completion
+less
+nano
+vim-tiny
+htop
+iotop
+ncdu
+curl
+wget
+rsync
+tree
+unzip
+zip
+p7zip-full
+xz-utils
+
+# apt tooling
+apt-transport-https
+ca-certificates
+gnupg
+software-properties-common
+unattended-upgrades
+apt-listchanges
+
+# locale (Argentina default)
+locales
+console-setup
+keyboard-configuration
+
+# audio stack — PipeWire
+pipewire
+pipewire-pulse
+pipewire-alsa
+pipewire-jack
+wireplumber
+alsa-utils

@@ -1,0 +1,37 @@
+# shirOS — drivers, firmware, hardware support
+# Maximiza compatibilidad out-of-the-box.
+
+# WiFi / wireless firmware
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
+firmware-libertas
+firmware-misc-nonfree
+firmware-ralink
+
+# Bluetooth firmware
+firmware-zd1211
+
+# Graphics
+firmware-amd-graphics
+mesa-utils
+vulkan-tools
+mesa-vulkan-drivers
+vdpau-driver-all
+va-driver-all
+intel-media-va-driver-non-free
+
+# Audio firmware
+firmware-sof-signed
+
+# Input devices
+xserver-xorg-input-libinput
+xserver-xorg-input-wacom
+
+# USB / hotplug
+usbutils
+pciutils
+
+# Bluetooth audio
+libspa-0.2-bluetooth

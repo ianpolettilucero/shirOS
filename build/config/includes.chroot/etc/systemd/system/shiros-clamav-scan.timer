@@ -1,0 +1,21 @@
+[Unit]
+Description=shirOS — schedule semanal ClamAV (Lunes 9:00 AM)
+Documentation=https://github.com/ianpolettilucero/shiros/blob/main/docs/decisions/0003-default-apps.md
+
+[Timer]
+# Lunes 9:00 AM hora local.
+OnCalendar=Mon *-*-* 09:00:00
+
+# Si el equipo estaba apagado al horario, correr cuando se prenda.
+Persistent=true
+
+# Aleatorizar hasta +30 min para no martillar la red corporativa
+# si todos los equipos arrancan al mismo tiempo.
+RandomizedDelaySec=30min
+
+# Solo si hay AC power (no quemar batería en laptops).
+# (Para forzar siempre: comentá esta línea.)
+# ConditionACPower=true
+
+[Install]
+WantedBy=timers.target
