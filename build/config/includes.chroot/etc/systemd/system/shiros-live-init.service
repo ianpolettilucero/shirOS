@@ -1,0 +1,16 @@
+[Unit]
+Description=shirOS — fallback de inicialización del user live
+# Tiene que correr después que live-config creó al user
+After=live-config.service
+# Y antes que LightDM intente login/autologin
+Before=lightdm.service display-manager.service
+ConditionKernelCommandLine=boot=live
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/shiros-live-init
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

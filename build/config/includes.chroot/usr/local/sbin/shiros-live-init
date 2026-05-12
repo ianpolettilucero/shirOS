@@ -1,0 +1,42 @@
+#!/bin/sh
+# shirOS — backup de inicialización del user live.
+# Ejecutado por shiros-live-init.service después de live-config y antes
+# de display-manager. Hace lo mismo que /lib/live/config/9999-shiros-credentials
+# por si live-config en trixie no está procesando ese path.
+#
+# Idempotente: se puede correr múltiples veces sin romper nada.
+
+set -e
+
+LOG=/var/log/shiros-live-init.log
+exec >>"${LOG}" 2>&1
+echo "=== $(date -Iseconds) shiros-live-init start ==="
+
+if ! getent passwd live >/dev/null 2>&1; then
+    echo "I: user 'live' aún no existe — saliendo (debería crearlo live-config primero)"
+    exit 0
+fi
+
+# Password conocido
+echo 'live:live' | chpasswd
+echo "I: password de 'live' seteado a 'live'"
+
+# Passwordless sudo
+cat > /etc/sudoers.d/shiros-live <<'EOF'
+live ALL=(ALL) NOPASSWD: ALL
+EOF
+chmod 0440 /etc/sudoers.d/shiros-live
+echo "I: sudoers escrito"
+
+# Grupo nopasswdlogin (defensa en profundidad — el PAM override ya lo hace
+# innecesario, pero por las dudas)
+if ! getent group nopasswdlogin >/dev/null 2>&1; then
+    groupadd -r nopasswdlogin
+    echo "I: grupo nopasswdlogin creado"
+fi
+usermod -aG nopasswdlogin live
+echo "I: 'live' agregado a nopasswdlogin"
+
+# Marker para verificar post-boot que esto corrió
+touch /var/run/shiros-live-init.done
+echo "=== $(date -Iseconds) shiros-live-init OK ==="
