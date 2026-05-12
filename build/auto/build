@@ -1,7 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 # shirOS — live-build wrapper
-# Invocado por `lb build`. Loguea a build.log para debug.
+# Loguea a build.log para debug. Usa pipefail para que un fallo de
+# `lb build` no quede tapado por el exit code 0 de `tee`.
 
 set -e
+set -o pipefail
 
 lb build noauto "${@}" 2>&1 | tee build.log
