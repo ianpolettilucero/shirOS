@@ -48,5 +48,27 @@ if dpkg -s rustdesk >/dev/null 2>&1; then
     systemctl enable rustdesk.service || true
 fi
 
+# Fleet metrics (decisión 0004: silent by default).
+# prometheus-node-exporter viene instalado pero DISABLED.
+# El admin IT lo habilita con `sudo shiros-fleet enable-pull`.
+if dpkg -s prometheus-node-exporter >/dev/null 2>&1; then
+    systemctl disable prometheus-node-exporter.service || true
+    systemctl mask prometheus-node-exporter.service || true
+fi
+
+# shiros-fleet-push.timer queda enmascarada — la activa shiros-fleet enable-push.
+if [ -f /etc/systemd/system/shiros-fleet-push.timer ]; then
+    systemctl mask shiros-fleet-push.timer || true
+fi
+
 # Disable cosas que no usamos (reducen boot time)
 systemctl mask plymouth-quit-wait.service || true
+
+# Telemetría Debian: NUNCA instalar popularity-contest.
+# (Si por alguna razón vino como dependencia, lo desactivamos.)
+if [ -f /etc/cron.daily/popularity-contest ]; then
+    chmod -x /etc/cron.daily/popularity-contest || true
+fi
+if dpkg -s popularity-contest >/dev/null 2>&1; then
+    apt-get -y purge popularity-contest || true
+fi

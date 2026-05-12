@@ -33,22 +33,23 @@
 | **Hardware target** | Mix amplio (2GB RAM mínimo, 8GB+ recomendado) | Single ISO que detecta y se adapta. |
 | **Suite oficina** | Web (Google Docs / Office 365) vía PWA | Reduce peso, evita problemas de compat .docx. |
 
-## 3. Decisiones de apps y políticas (confirmadas — ADR 0003)
+## 3. Decisiones confirmadas (ADRs 0003 + 0004)
 
 | # | Decisión | Resultado |
 |---|---|---|
-| 1 | Browser default | **Firefox ESR** preinstalado. Brave on-demand vía welcome wizard (Flatpak). |
+| 1 | Browser default | **Firefox ESR** preinstalado (con enterprise policy que apaga telemetría, studies, Pocket). Brave on-demand vía welcome wizard (Flatpak). |
 | 2 | Soporte remoto IT | **RustDesk** preinstalado y configurado como servicio. `.deb` provisto vía `build/config/packages.chroot/`. |
 | 3 | Apps comunicación | **Web Launchers** preinstalados (Teams, WhatsApp, Slack, Outlook, Office 365, Gmail, Workspace, Meet, Zoom). Clientes nativos on-demand. |
 | 4 | VPN | Los 4 protocolos comunes preinstalados: **OpenVPN, OpenConnect (Cisco), L2TP, WireGuard**. |
 | 5 | Antivirus | **ClamAV** scan semanal Lunes 9 AM (systemd timer) con `Nice=19` + `IOSchedulingClass=idle`. **No** clamd on-access. |
 | 6 | Updates | `unattended-upgrades` solo para **Debian Security**. Feature updates notifican vía gnome-software, usuario decide. **Nunca reboot automático.** |
+| 7 | Telemetría / diagnóstico | **Silent by default**: cero telemetría externa. `popularity-contest` purgado, Firefox enterprise policy sin telemetría. Hook opt-in `shiros-fleet` para que IT corporativo enchufe Prometheus/Grafana propios. |
 
-Detalle completo y razones en [`docs/decisions/0003-default-apps.md`](./docs/decisions/0003-default-apps.md).
+ADRs:
+- [`0003-default-apps.md`](./docs/decisions/0003-default-apps.md) — apps, RustDesk, ClamAV, VPN, updates.
+- [`0004-silent-by-default-telemetry.md`](./docs/decisions/0004-silent-by-default-telemetry.md) — política de privacidad + fleet metrics opt-in.
 
-### Aún pendiente
-
-- **Telemetría/diagnóstico opt-in**: ¿algún mecanismo para que el equipo central reciba reportes de fallos? Privacy-first por default. Decisión postergada para Fase 5 (testing & release).
+**Sin pendientes.** El plan queda cerrado para Fase 1.
 
 ## 4. Identidad visual
 
@@ -99,6 +100,14 @@ Detalle completo y razones en [`docs/decisions/0003-default-apps.md`](./docs/dec
 - `clamav` + `clamav-freshclam`
 - `shiros-clamav-scan.timer` corre Lunes 9 AM con `Nice=19`, `IOSchedulingClass=idle`
 - **No** `clamd` (sin on-access scan)
+
+### Fleet metrics — opt-in (preinstalado disabled, ADR 0004)
+- `prometheus-node-exporter` (instalado pero `masked` por default)
+- `/usr/bin/shiros-fleet` — CLI para que IT admin active pull o push
+- `shiros-fleet-push.{service,timer}` — masked hasta `shiros-fleet enable-push`
+- `/etc/shiros/fleet.{conf,README.md}` — config + docs para admin
+- Firefox policies: `/etc/firefox-esr/policies/policies.json` apaga telemetry, studies, Pocket
+- Hook 0010 purga `popularity-contest` si llegara a aparecer
 
 ### Web Launchers preinstalados (ADR 0003)
 `.desktop` files que abren en Firefox `--new-window`:
@@ -303,6 +312,8 @@ El target corporativo usa frecuentemente 2 monitores (notebook + monitor externo
 - ✅ Detecta el 95% de hardware corporativo común en AR
 - ✅ Detecta y configura segundo monitor automáticamente
 - ✅ Dual-boot con Windows funciona sin romper el bootloader original
+- ✅ **Cero conexiones outbound salvo apt.debian.org en una PC recién instalada** (auditable con `tcpdump`)
+- ✅ **`shiros-fleet status` en una PC vanilla reporta "disabled"** en los 3 modos
 - ✅ Usuario no técnico puede instalar sin asistencia
 
 ## 12. Riesgos y mitigaciones
