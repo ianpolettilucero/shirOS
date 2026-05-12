@@ -12,6 +12,7 @@ amd64-microcode
 # init & service mgmt
 systemd
 systemd-sysv
+systemd-timesyncd
 dbus
 
 # networking

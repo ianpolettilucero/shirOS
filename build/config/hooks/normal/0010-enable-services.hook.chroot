@@ -28,8 +28,8 @@ systemctl enable unattended-upgrades.service || true
 systemctl enable apt-daily.timer || true
 systemctl enable apt-daily-upgrade.timer || true
 
-# Time sync
-systemctl enable systemd-timesyncd.service
+# Time sync (systemd-timesyncd vive en su propio paquete desde bookworm).
+systemctl enable systemd-timesyncd.service || true
 
 # ClamAV (decisión 0003: scan semanal Lunes 9 AM, low priority)
 # NO habilitamos clamav-daemon (clamd) — sería on-access scan, demasiado pesado.
