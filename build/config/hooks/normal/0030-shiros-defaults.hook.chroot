@@ -33,8 +33,11 @@ ICON_NAME=computer-laptop
 CHASSIS=laptop
 EOF
 
-# Permitir wheel/sudo sin password en live (solo live, el instalador define el real)
-# Esto está OK porque la live no persiste
+# Credenciales y sudo del user 'live' los maneja al boot
+#   /lib/live/config/9999-shiros-credentials
+# (corre después de que live-config creó al usuario, ahí ya existe).
+# El autologin de LightDM lo maneja
+#   /etc/lightdm/lightdm.conf.d/50-shiros-autologin.conf
 
 # Asegurar que los scripts custom son ejecutables
 chmod +x /usr/bin/shiros-* 2>/dev/null || true
