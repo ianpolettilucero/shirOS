@@ -1,0 +1,49 @@
+{
+  "policies": {
+    "_comment": "shirOS — Firefox enterprise policy (decisión 0004: silent by default).",
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "DisableFeedbackCommands": true,
+    "DontCheckDefaultBrowser": true,
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+
+    "FirefoxHome": {
+      "Pocket": false,
+      "SponsoredPocket": false,
+      "SponsoredTopSites": false,
+      "Snippets": false,
+      "Locked": false
+    },
+
+    "UserMessaging": {
+      "WhatsNew": false,
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "MoreFromMozilla": false,
+      "UrlbarInterventions": false,
+      "SkipOnboarding": true
+    },
+
+    "EnableTrackingProtection": {
+      "Value": true,
+      "Locked": false
+    },
+
+    "OfferToSaveLogins": true,
+    "PasswordManagerEnabled": true,
+
+    "Homepage": {
+      "URL": "about:blank",
+      "Locked": false
+    },
+
+    "SearchEngines": {
+      "Default": "DuckDuckGo"
+    },
+
+    "ExtensionUpdate": true,
+    "DisableAppUpdate": false
+  }
+}

@@ -1,0 +1,31 @@
+[Unit]
+Description=shirOS — push de métricas al Pushgateway corporativo
+Documentation=file:///etc/shiros/fleet.README.md
+After=network-online.target
+Wants=network-online.target
+
+# Disabled por default (decisión 0004). Lo activa shiros-fleet enable-push.
+ConditionPathExists=/etc/shiros/fleet.conf
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/shiros/fleet.conf
+ExecStart=/bin/bash -c '\
+    [ "$SHIROS_FLEET_MODE" = "push" ] || exit 0; \
+    [ -n "$SHIROS_FLEET_PUSH_URL" ] || exit 0; \
+    HOSTNAME=$(hostname); \
+    metrics=$(curl -fsS http://127.0.0.1:9100/metrics 2>/dev/null || /usr/bin/prometheus-node-exporter --web.listen-address=127.0.0.1:9100 & sleep 2; curl -fsS http://127.0.0.1:9100/metrics); \
+    auth=""; \
+    [ -n "$SHIROS_FLEET_PUSH_USER" ] && auth="--user $SHIROS_FLEET_PUSH_USER:$SHIROS_FLEET_PUSH_PASSWORD"; \
+    echo "$metrics" | curl -fsS $auth --data-binary @- "$SHIROS_FLEET_PUSH_URL/instance/$HOSTNAME"'
+
+# Low priority — no afectar al usuario.
+Nice=15
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

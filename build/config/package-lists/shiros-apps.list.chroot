@@ -66,3 +66,8 @@ clamav-freshclam
 
 # RustDesk: provisto via build/config/packages.chroot/ (.deb manual o
 # scripts/fetch-rustdesk-deb.sh). Servicio enabled en hook 0010.
+
+# Fleet metrics (decisión 0004): instalado pero DISABLED por default.
+# El admin IT puede habilitarlo con `sudo shiros-fleet enable-pull` o
+# `enable-push`. Privacy-first: silent by default.
+prometheus-node-exporter

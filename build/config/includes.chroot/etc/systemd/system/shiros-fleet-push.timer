@@ -1,0 +1,17 @@
+[Unit]
+Description=shirOS — schedule de push de métricas (default 5m, configurable)
+Documentation=file:///etc/shiros/fleet.README.md
+
+[Timer]
+# Default cada 5 minutos. shiros-fleet enable-push --interval=Xm sobrescribe
+# este valor via drop-in en /etc/systemd/system/shiros-fleet-push.timer.d/.
+OnBootSec=2min
+OnUnitActiveSec=5min
+
+# Aleatorizar para que no todas las PCs pusheen en el mismo segundo.
+RandomizedDelaySec=30s
+
+Persistent=true
+
+[Install]
+WantedBy=timers.target
