@@ -85,6 +85,8 @@ ensure_scripts_executable() {
              "${BUILD_DIR}/auto/clean"
     chmod +x "${BUILD_DIR}/config/hooks/normal/"*.hook.chroot 2>/dev/null || true
     find "${BUILD_DIR}/config/includes.chroot/usr/bin" -type f -exec chmod +x {} \; 2>/dev/null || true
+    find "${BUILD_DIR}/config/includes.chroot/usr/local/sbin" -type f -exec chmod +x {} \; 2>/dev/null || true
+    find "${BUILD_DIR}/config/includes.chroot/lib/live/config" -type f -exec chmod +x {} \; 2>/dev/null || true
 }
 
 ensure_rustdesk_deb() {
