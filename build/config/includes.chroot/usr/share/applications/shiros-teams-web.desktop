@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Microsoft Teams (Web)
+GenericName=Teams
+Comment=Microsoft Teams en el navegador
+Exec=firefox-esr --new-window https://teams.microsoft.com
+Icon=microsoft-teams
+Terminal=false
+StartupNotify=true
+Categories=Network;InstantMessaging;Office;
+Keywords=teams;chat;meeting;reuniones;corporativo;
+StartupWMClass=Microsoft Teams

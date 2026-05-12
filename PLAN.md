@@ -33,17 +33,22 @@
 | **Hardware target** | Mix amplio (2GB RAM mínimo, 8GB+ recomendado) | Single ISO que detecta y se adapta. |
 | **Suite oficina** | Web (Google Docs / Office 365) vía PWA | Reduce peso, evita problemas de compat .docx. |
 
-## 3. Decisiones pendientes (para confirmar)
+## 3. Decisiones de apps y políticas (confirmadas — ADR 0003)
 
-Estas no bloquean el scaffold inicial pero sí afectan paquetes finales:
+| # | Decisión | Resultado |
+|---|---|---|
+| 1 | Browser default | **Firefox ESR** preinstalado. Brave on-demand vía welcome wizard (Flatpak). |
+| 2 | Soporte remoto IT | **RustDesk** preinstalado y configurado como servicio. `.deb` provisto vía `build/config/packages.chroot/`. |
+| 3 | Apps comunicación | **Web Launchers** preinstalados (Teams, WhatsApp, Slack, Outlook, Office 365, Gmail, Workspace, Meet, Zoom). Clientes nativos on-demand. |
+| 4 | VPN | Los 4 protocolos comunes preinstalados: **OpenVPN, OpenConnect (Cisco), L2TP, WireGuard**. |
+| 5 | Antivirus | **ClamAV** scan semanal Lunes 9 AM (systemd timer) con `Nice=19` + `IOSchedulingClass=idle`. **No** clamd on-access. |
+| 6 | Updates | `unattended-upgrades` solo para **Debian Security**. Feature updates notifican vía gnome-software, usuario decide. **Nunca reboot automático.** |
 
-1. **Browser default**: ¿Firefox ESR (corporate-stable, FOSS), Brave (privacy+Chromium compat) o ambos preinstalados?
-2. **Gestión remota IT**: ¿RustDesk preinstalado para que el soporte IT pueda asistir remotamente? (Recomendado.)
-3. **Apps de comunicación**: ¿Preinstalar wrappers PWA de Teams/WhatsApp/Slack o que el usuario los instale on-demand?
-4. **VPN corporativo**: ¿Incluir openconnect (Cisco AnyConnect compat), wireguard y openvpn por default?
-5. **Antivirus**: ¿ClamAV scheduled scan o nada? Linux normalmente no lo necesita pero el corporativo lo suele exigir.
-6. **Política de updates**: ¿Auto-instalar security updates (recomendado) o sólo notificar?
-7. **Telemetría/diagnóstico**: ¿Algún mecanismo opt-in para que el equipo central reciba reportes de fallos? Privacy-first por default.
+Detalle completo y razones en [`docs/decisions/0003-default-apps.md`](./docs/decisions/0003-default-apps.md).
+
+### Aún pendiente
+
+- **Telemetría/diagnóstico opt-in**: ¿algún mecanismo para que el equipo central reciba reportes de fallos? Privacy-first por default. Decisión postergada para Fase 5 (testing & release).
 
 ## 4. Identidad visual
 
@@ -81,13 +86,31 @@ Estas no bloquean el scaffold inicial pero sí afectan paquetes finales:
 - `network-manager-gnome` — wifi/VPN GUI
 - `flatpak` + `plugin-xfce4-flatpak` — para instalar apps adicionales
 
-### Apps corporativas (vía Flatpak post-install)
-- `com.microsoft.Edge` (alternativa cuando Teams web no anda en Firefox)
-- `com.google.Chrome`
-- `us.zoom.Zoom`
-- `com.slack.Slack`
-- `com.anydesk.AnyDesk` / `com.rustdesk.RustDesk`
-- `org.onlyoffice.desktopeditors` (si el usuario lo pide)
+### Soporte remoto IT (preinstalado, ADR 0003)
+- **RustDesk** (vía `.deb` en `build/config/packages.chroot/`)
+- Servicio `rustdesk.service` enabled al boot
+
+### VPN (preinstalado, ADR 0003)
+- `network-manager-{openvpn,openconnect,l2tp}-gnome`
+- `wireguard`, `wireguard-tools` (soporte nativo NetworkManager)
+- `openvpn`, `openconnect`
+
+### Antivirus / compliance (preinstalado, ADR 0003)
+- `clamav` + `clamav-freshclam`
+- `shiros-clamav-scan.timer` corre Lunes 9 AM con `Nice=19`, `IOSchedulingClass=idle`
+- **No** `clamd` (sin on-access scan)
+
+### Web Launchers preinstalados (ADR 0003)
+`.desktop` files que abren en Firefox `--new-window`:
+- Microsoft Teams (Web), WhatsApp Web, Slack (Web)
+- Outlook (Web), Office 365, Gmail, Google Workspace, Google Meet, Zoom (Web)
+
+### Clientes nativos on-demand (welcome wizard → Flatpak)
+- `com.brave.Browser` (alternativa Chromium-based)
+- `com.google.Chrome` (cuando una web app exige Chromium)
+- `us.zoom.Zoom`, `com.slack.Slack`
+- `com.github.IsmaelMartinez.teams_for_linux`
+- `org.onlyoffice.desktopeditors`
 
 ### Drivers / firmware
 - `firmware-linux` + `firmware-linux-nonfree`

@@ -17,9 +17,14 @@ dbus
 # networking
 network-manager
 network-manager-gnome
+# VPN — los 3 protocolos comunes en corporate AR (decisión 0003)
 network-manager-openvpn-gnome
 network-manager-openconnect-gnome
 network-manager-l2tp-gnome
+wireguard
+wireguard-tools
+openvpn
+openconnect
 wpasupplicant
 iwd
 avahi-daemon

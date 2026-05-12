@@ -58,3 +58,11 @@ gnome-calendar
 
 # Webcam test
 cheese
+
+# Antivirus — exigido por compliance corporativo (decisión 0003).
+# Configurado como scan semanal Lunes 9 AM, low priority. NO on-access.
+clamav
+clamav-freshclam
+
+# RustDesk: provisto via build/config/packages.chroot/ (.deb manual o
+# scripts/fetch-rustdesk-deb.sh). Servicio enabled en hook 0010.

@@ -36,38 +36,47 @@ if ! nmcli -t -f STATE general | grep -q connected; then
 fi
 
 # ─────────────────────────────────────────────────────────────
-# Pantalla 3: Apps adicionales
+# Pantalla 3: Apps nativas opcionales
+#
+# Por default shirOS no instala apps de comunicación (decisión 0003):
+# usás los Web Launchers del menú (Teams Web, WhatsApp Web, Slack Web,
+# Outlook Web, Office 365, Gmail, Google Workspace, Meet, Zoom Web).
+# Esto mantiene la imagen liviana.
+#
+# Si necesitás un cliente NATIVO (ej. para mejor integración, screen
+# share avanzado, o uso offline), podés instalarlo acá.
 # ─────────────────────────────────────────────────────────────
 APPS=$(zenity --list --checklist \
-    --title="Apps adicionales" \
-    --text="Marcá las apps que querés instalar. Podés instalar más después desde el centro de software." \
+    --title="Apps nativas (opcionales)" \
+    --text="Por default usás las apps web (ya tenés accesos directos en el menú).\n\nSi necesitás clientes <b>nativos</b> (mejor integración, screen share, uso offline), marcalos acá.\n\nPodés instalar más después desde el centro de software." \
     --column="Instalar" --column="App" --column="Descripción" \
-    FALSE "google-chrome" "Google Chrome (necesario para algunas web apps corporativas)" \
-    FALSE "zoom" "Zoom (videollamadas)" \
-    FALSE "slack" "Slack (mensajería corporativa)" \
-    FALSE "teams" "Microsoft Teams" \
-    FALSE "rustdesk" "RustDesk (soporte remoto IT)" \
-    FALSE "onlyoffice" "OnlyOffice (alternativa offline a MS Office)" \
-    --width=620 --height=420 --separator=" " 2>/dev/null) || APPS=""
+    FALSE "brave"      "Brave Browser (Chromium con privacy, alternativa a Firefox)" \
+    FALSE "chrome"     "Google Chrome (cuando una web app corporativa exige Chrome)" \
+    FALSE "zoom"       "Zoom desktop (mejor calidad de video y screen share)" \
+    FALSE "slack"      "Slack desktop (notificaciones nativas)" \
+    FALSE "teams"      "Microsoft Teams desktop" \
+    FALSE "onlyoffice" "OnlyOffice (suite offline compatible con .docx/.xlsx/.pptx)" \
+    --width=680 --height=460 --separator=" " 2>/dev/null) || APPS=""
 
 if [ -n "${APPS}" ]; then
     (
-        echo "10" ; echo "# Preparando..."
+        echo "5" ; echo "# Preparando Flatpak..."
         sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null
-        local_progress=20
+        local_progress=10
         for app in ${APPS}; do
             case "${app}" in
-                google-chrome) flatpak_id="com.google.Chrome" ;;
-                zoom) flatpak_id="us.zoom.Zoom" ;;
-                slack) flatpak_id="com.slack.Slack" ;;
-                teams) flatpak_id="com.github.IsmaelMartinez.teams_for_linux" ;;
-                rustdesk) flatpak_id="com.rustdesk.RustDesk" ;;
+                brave)      flatpak_id="com.brave.Browser" ;;
+                chrome)     flatpak_id="com.google.Chrome" ;;
+                zoom)       flatpak_id="us.zoom.Zoom" ;;
+                slack)      flatpak_id="com.slack.Slack" ;;
+                teams)      flatpak_id="com.github.IsmaelMartinez.teams_for_linux" ;;
                 onlyoffice) flatpak_id="org.onlyoffice.desktopeditors" ;;
-                *) continue ;;
+                *)          continue ;;
             esac
             echo "${local_progress}" ; echo "# Instalando ${app}..."
             sudo flatpak install -y flathub "${flatpak_id}" 2>&1 | grep -v '^$' >&2 || true
             local_progress=$((local_progress + 15))
+            [ "${local_progress}" -gt 95 ] && local_progress=95
         done
         echo "100" ; echo "# Listo"
     ) | zenity --progress --title="Instalando apps" --width=480 --auto-close 2>/dev/null || true
@@ -89,7 +98,7 @@ fi
 # ─────────────────────────────────────────────────────────────
 zenity --info \
     --title="Listo" \
-    --text="<big><b>¡Todo listo!</b></big>\n\nshirOS está configurado.\n\nAtajos útiles:\n  • <b>Super</b> = Menú\n  • <b>Super+E</b> = Archivos\n  • <b>Super+T</b> = Terminal\n  • <b>Super+P</b> = Pantallas\n  • <b>Super+L</b> = Bloquear\n\nDisfrutalo." \
-    --width=480 2>/dev/null || true
+    --text="<big><b>¡Todo listo!</b></big>\n\nshirOS está configurado.\n\n<b>Apps web</b> ya en el menú:\n  Teams · WhatsApp · Slack · Outlook · Office 365\n  Gmail · Google Workspace · Meet · Zoom\n\n<b>Atajos útiles</b>:\n  • <b>Super</b> = Menú\n  • <b>Super+E</b> = Archivos\n  • <b>Super+T</b> = Terminal\n  • <b>Super+P</b> = Pantallas\n  • <b>Super+L</b> = Bloquear\n  • <b>Print</b> = Captura\n\n<i>RustDesk ya está corriendo: pediéndole tu ID al equipo de IT pueden asistirte.</i>\n\nDisfrutalo." \
+    --width=520 2>/dev/null || true
 
 touch "${MARKER}"

@@ -87,6 +87,27 @@ ensure_scripts_executable() {
     find "${BUILD_DIR}/config/includes.chroot/usr/bin" -type f -exec chmod +x {} \; 2>/dev/null || true
 }
 
+ensure_rustdesk_deb() {
+    local pkg_dir="${BUILD_DIR}/config/packages.chroot"
+    mkdir -p "${pkg_dir}"
+    if ls "${pkg_dir}"/rustdesk*.deb >/dev/null 2>&1; then
+        log "RustDesk .deb presente."
+        return
+    fi
+    warn "No hay rustdesk*.deb en ${pkg_dir}"
+    warn "RustDesk se preinstala (decisión 0003) — necesito el .deb."
+    if [ -x "${REPO_ROOT}/scripts/fetch-rustdesk-deb.sh" ]; then
+        log "Intentando bajar automáticamente..."
+        if "${REPO_ROOT}/scripts/fetch-rustdesk-deb.sh"; then
+            log "RustDesk .deb descargado."
+            return
+        fi
+        warn "Fetch falló. Bajalo manual de https://github.com/rustdesk/rustdesk/releases/latest"
+        warn "y copialo a ${pkg_dir}/"
+        warn "Continuando sin RustDesk (la ISO se buildea pero sin esa app)."
+    fi
+}
+
 clean_build() {
     log "Limpiando builds previos..."
     cd "${BUILD_DIR}"
@@ -162,6 +183,7 @@ require_root
 check_dependencies
 check_disk_space
 ensure_scripts_executable
+ensure_rustdesk_deb
 clean_build
 run_build
 move_artifacts

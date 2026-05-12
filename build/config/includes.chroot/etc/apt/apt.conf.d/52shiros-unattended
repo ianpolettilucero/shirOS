@@ -1,0 +1,50 @@
+// shirOS — política de unattended-upgrades.
+// Decisión 0003: auto-install SOLO security; feature updates notifican vía
+// gnome-software para que el usuario/admin elija cuándo aplicarlas.
+//
+// Este file (52*) se carga DESPUÉS del default 50unattended-upgrades.conf
+// y sobrescribe sus directivas.
+
+Unattended-Upgrade::Origins-Pattern {
+    // Debian Security solamente.
+    "origin=Debian,codename=${distro_codename},label=Debian-Security";
+    "origin=Debian,codename=${distro_codename}-security,label=Debian-Security";
+
+    // NO incluimos:
+    //  - Debian main / updates → feature updates van por gnome-software
+    //  - backports → idem
+};
+
+// Paquetes que NUNCA actualizar automáticamente.
+Unattended-Upgrade::Package-Blacklist {
+    // El kernel se actualiza pero no se reboota auto.
+    // Si querés bloquearlo, descomentá la próxima línea:
+    // "linux-image-.*";
+};
+
+// Comportamiento general
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+Unattended-Upgrade::MinimalSteps "true";
+Unattended-Upgrade::InstallOnShutdown "false";
+Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+// NO rebootear automático: el usuario debe elegir.
+// Si se necesita reboot, gnome-software muestra un badge en el panel.
+Unattended-Upgrade::Automatic-Reboot "false";
+
+// Logging
+Unattended-Upgrade::SyslogEnable "true";
+Unattended-Upgrade::SyslogFacility "daemon";
+
+// Sin emails (es desktop, no servidor).
+Unattended-Upgrade::Mail "";
+Unattended-Upgrade::MailReport "on-change";
+
+// Si falla el upgrade, no terminar con error fatal.
+Unattended-Upgrade::OnlyOnACPower "false";
+Unattended-Upgrade::Skip-Updates-On-Metered-Connections "true";
+
+// Verbose en logs cuando hay problemas
+Unattended-Upgrade::Verbose "false";
+Unattended-Upgrade::Debug "false";

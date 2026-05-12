@@ -49,3 +49,7 @@ venv/
 # QEMU test artifacts
 *.qcow2
 test-disk.img
+
+# Local .debs (downloaded by fetch-rustdesk-deb.sh, etc.)
+# Each build pulls fresh binaries — no commitearlos.
+build/config/packages.chroot/*.deb
