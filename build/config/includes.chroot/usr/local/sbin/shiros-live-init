@@ -1,8 +1,7 @@
 #!/bin/sh
-# shirOS — backup de inicialización del user live.
-# Ejecutado por shiros-live-init.service después de live-config y antes
-# de display-manager. Hace lo mismo que /lib/live/config/9999-shiros-credentials
-# por si live-config en trixie no está procesando ese path.
+# shirOS — inicialización de la sesión live.
+# Corre vía shiros-live-init.service (After=live-config, Before=lightdm),
+# solo cuando boot=live está en kernel cmdline.
 #
 # Idempotente: se puede correr múltiples veces sin romper nada.
 
@@ -17,19 +16,18 @@ if ! getent passwd live >/dev/null 2>&1; then
     exit 0
 fi
 
-# Password conocido
+# 1. Password conocido para fallback si autologin falla
 echo 'live:live' | chpasswd
 echo "I: password de 'live' seteado a 'live'"
 
-# Passwordless sudo
+# 2. Passwordless sudo (necesario para Calamares)
 cat > /etc/sudoers.d/shiros-live <<'EOF'
 live ALL=(ALL) NOPASSWD: ALL
 EOF
 chmod 0440 /etc/sudoers.d/shiros-live
 echo "I: sudoers escrito"
 
-# Grupo nopasswdlogin (defensa en profundidad — el PAM override ya lo hace
-# innecesario, pero por las dudas)
+# 3. Grupo nopasswdlogin (gate de PAM para lightdm-autologin)
 if ! getent group nopasswdlogin >/dev/null 2>&1; then
     groupadd -r nopasswdlogin
     echo "I: grupo nopasswdlogin creado"
@@ -37,12 +35,24 @@ fi
 usermod -aG nopasswdlogin live
 echo "I: 'live' agregado a nopasswdlogin"
 
-# Fallback de hostname — live-config en trixie a veces agrega "-live"
-# automáticamente. Forzamos el hostname correcto si quedó mal.
+# 4. LightDM autologin — escribimos la config en runtime para que NO se
+#    aplique al sistema instalado (donde el user 'live' no existe).
+mkdir -p /etc/lightdm/lightdm.conf.d
+cat > /etc/lightdm/lightdm.conf.d/50-shiros-autologin.conf <<'EOF'
+[Seat:*]
+autologin-user=live
+autologin-user-timeout=0
+autologin-session=xfce
+user-session=xfce
+greeter-hide-users=false
+EOF
+echo "I: LightDM autologin snippet escrito"
+
+# 5. Fallback de hostname — live-config en trixie a veces agrega "-live".
 if [ "$(hostname)" != "shiros" ]; then
     echo "shiros" > /etc/hostname
     hostname shiros
-    echo "I: hostname forzado a 'shiros' (estaba: $(cat /etc/hostname 2>/dev/null))"
+    echo "I: hostname forzado a 'shiros'"
 fi
 
 # Marker para verificar post-boot que esto corrió
