@@ -1,0 +1,76 @@
+#!/bin/bash
+# shirOS — instalador opt-in de Wine + Bottles.
+# Para correr aplicaciones Windows nativas (versiones VIEJAS de AutoCAD,
+# MS Project, etc). NO se instala por default porque:
+#   - Pesa ~600 MB (Wine + deps)
+#   - La compatibilidad con apps modernas es mala
+#   - Por default usamos Web (AutoCAD Web, Project for the Web)
+#
+# Uso:
+#   sudo shiros-install-wine
+#
+# Después abrís "Bottles" desde el menú para gestionar prefijos Wine.
+
+set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Este script requiere sudo. Probá: sudo shiros-install-wine"
+    exit 1
+fi
+
+cat <<'EOF'
+shirOS — Instalador de Wine + Bottles
+─────────────────────────────────────────────────────────────
+Esto va a instalar:
+  - Wine (capa de compat Windows)
+  - Wine32 (libs 32-bit, muchos instaladores las piden)
+  - winetricks (helper para deps de apps Windows)
+  - Bottles (GUI moderna para Wine, vía Flatpak)
+
+Espacio aprox: ~600 MB.
+
+CAVEAT — apps NO soportadas oficialmente en Wine:
+  - AutoCAD modernos (2018+): no funcionan bien.
+    Usá AutoCAD Web (icono en el menú) que es oficial.
+  - MS Project moderno: parcial. Mejor ProjectLibre o
+    Project for the Web (ambos ya instalados).
+
+Wine sirve mayormente para apps Windows viejas y simples.
+
+EOF
+
+read -rp "Continuar con la instalación? [y/N]: " ans
+case "${ans}" in
+    y|Y|yes|YES) ;;
+    *) echo "Cancelado."; exit 0 ;;
+esac
+
+echo
+echo "[1/4] Habilitando arquitectura i386 (para libs 32-bit)..."
+dpkg --add-architecture i386
+apt update
+
+echo
+echo "[2/4] Instalando Wine + winetricks..."
+apt install -y wine wine32 wine64 winetricks winbind
+
+echo
+echo "[3/4] Instalando Bottles (vía Flatpak)..."
+flatpak install -y --noninteractive flathub com.usebottles.bottles
+
+echo
+echo "[4/4] Listo."
+cat <<'EOF'
+
+Wine + Bottles instalados.
+
+Próximos pasos:
+  1. Abrí "Bottles" desde el menú de apps.
+  2. Creá un bottle nuevo (Software → New Bottle).
+  3. Bajá el instalador .exe de la app Windows.
+  4. En el bottle: Add Program → seleccioná el .exe.
+
+Para desinstalar todo esto:
+  sudo apt purge wine wine32 wine64 winetricks winbind
+  flatpak uninstall com.usebottles.bottles
+EOF

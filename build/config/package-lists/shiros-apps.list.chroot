@@ -1,13 +1,17 @@
 # shirOS — user-facing applications
 # Browser, mail, editor, viewers, basic productivity.
 
-# Browser principal
-firefox-esr
-firefox-esr-l10n-es-ar
+# Browser principal — Falkon (QtWebEngine = mismo engine que Chromium,
+# soporta toda la web moderna: Gmail, Office365, Teams, AutoCAD Web, etc).
+# Mucho más liviano que Firefox ESR: ~50 MB vs ~120 MB instalado,
+# ~200 MB vs ~400 MB RAM idle.
+# Si el user necesita Firefox por extensiones específicas, instalable
+# después desde gnome-software.
+falkon
 
-# Mail
-thunderbird
-thunderbird-l10n-es-ar
+# Mail: NO instalado por default — la mayoría usa webmail (Gmail/Outlook
+# vía web). Si hace falta cliente nativo, gnome-software ofrece
+# thunderbird o evolution.
 
 # Text editor
 mousepad
@@ -42,6 +46,11 @@ gnome-screenshot
 # Calculator
 galculator
 
+# Project management — alternativas opt-in (NO instaladas por default
+# para mantener la ISO liviana). Para instalarlas:
+#   sudo shiros-install-project   → ProjectLibre (.mpp compat, nativo)
+#   o usar Project for the Web vía el shortcut del menú.
+
 # Soft store (para que el usuario instale apps extra)
 flatpak
 gnome-software
@@ -56,8 +65,8 @@ timeshift
 # Calendar
 gnome-calendar
 
-# Webcam test
-cheese
+# Webcam test: NO instalado por default (niche). Si hace falta:
+#   sudo apt install cheese
 
 # Antivirus — exigido por compliance corporativo (decisión 0003).
 # Configurado como scan semanal Lunes 9 AM, low priority. NO on-access.
