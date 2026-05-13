@@ -40,6 +40,14 @@ build/source.iso
 branding/**/*.png.cache
 branding/plymouth/shiros/*.script.compiled
 
+# Version files — generados por scripts/build-iso.sh en cada build
+# desde SHIROS_VERSION. NO commitearlos: si están en git con un valor
+# fijo, el ISO va a mentir su versión cuando hagamos bump.
+build/config/includes.chroot/etc/os-release
+build/config/includes.chroot/etc/lsb-release
+build/config/includes.chroot/etc/issue
+build/config/includes.chroot/etc/issue.net
+
 # Python (if scripts use venvs)
 __pycache__/
 *.pyc

@@ -37,6 +37,14 @@ fi
 usermod -aG nopasswdlogin live
 echo "I: 'live' agregado a nopasswdlogin"
 
+# Fallback de hostname — live-config en trixie a veces agrega "-live"
+# automáticamente. Forzamos el hostname correcto si quedó mal.
+if [ "$(hostname)" != "shiros" ]; then
+    echo "shiros" > /etc/hostname
+    hostname shiros
+    echo "I: hostname forzado a 'shiros' (estaba: $(cat /etc/hostname 2>/dev/null))"
+fi
+
 # Marker para verificar post-boot que esto corrió
 touch /var/run/shiros-live-init.done
 echo "=== $(date -Iseconds) shiros-live-init OK ==="
