@@ -20,7 +20,7 @@ set -euo pipefail
 # Constantes
 # ─────────────────────────────────────────────────────────────
 
-SHIROS_VERSION="${SHIROS_VERSION:-0.1.7-shir}"
+SHIROS_VERSION="${SHIROS_VERSION:-0.1.8-shir}"
 SHIROS_ARCH="${SHIROS_ARCH:-amd64}"
 SHIROS_DIST="${SHIROS_DIST:-bookworm}"
 

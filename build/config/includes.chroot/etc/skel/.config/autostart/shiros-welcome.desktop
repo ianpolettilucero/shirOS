@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Bienvenido a shirOS
-Comment=Wizard de primer inicio
-Exec=/usr/bin/shiros-welcome --first-boot
-OnlyShowIn=XFCE;
-X-GNOME-Autostart-enabled=true
-NoDisplay=false

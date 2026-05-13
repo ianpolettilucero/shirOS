@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=AutoCAD Web
+GenericName=CAD
+Comment=AutoCAD oficial — drafting y edición 2D en el navegador
+Exec=falkon https://web.autocad.com
+Icon=applications-engineering
+Terminal=false
+StartupNotify=true
+Categories=Graphics;Engineering;
+Keywords=autocad;cad;dwg;dxf;design;drawing;arquitectura;
