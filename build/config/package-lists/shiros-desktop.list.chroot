@@ -5,10 +5,17 @@
 xorg
 xserver-xorg-input-libinput
 xserver-xorg-video-all
+# startx wrapper + Xsession.d — requerido por startxfce4 desde getty.
+# Con apt-recommends false xfce4-session no lo arrastra solo.
+xinit
 
 # XFCE core
 xfce4
 xfce4-session
+# dbus-launch + per-session dbus daemon — startxfce4 lo necesita.
+# Con apt-recommends false xfce4-session no lo trae como dep dura.
+dbus-x11
+dbus-user-session
 xfce4-panel
 xfce4-settings
 xfwm4
