@@ -20,7 +20,7 @@ set -euo pipefail
 # Constantes
 # ─────────────────────────────────────────────────────────────
 
-SHIROS_VERSION="${SHIROS_VERSION:-0.1.4-shir}"
+SHIROS_VERSION="${SHIROS_VERSION:-0.1.5-shir}"
 SHIROS_ARCH="${SHIROS_ARCH:-amd64}"
 SHIROS_DIST="${SHIROS_DIST:-bookworm}"
 
@@ -87,6 +87,43 @@ ensure_scripts_executable() {
     find "${BUILD_DIR}/config/includes.chroot/usr/bin" -type f -exec chmod +x {} \; 2>/dev/null || true
     find "${BUILD_DIR}/config/includes.chroot/usr/local/sbin" -type f -exec chmod +x {} \; 2>/dev/null || true
     find "${BUILD_DIR}/config/includes.chroot/lib/live/config" -type f -exec chmod +x {} \; 2>/dev/null || true
+}
+
+generate_version_files() {
+    # Genera os-release, lsb-release e issue con la versión actual.
+    # Estos archivos NO se commitean en git (.gitignored) — siempre se
+    # generan fresh por cada build. Así el filename del .iso y el contenido
+    # de /etc/os-release siempre matchean.
+    log "Generando archivos de versión (v=${SHIROS_VERSION})..."
+    local etc="${BUILD_DIR}/config/includes.chroot/etc"
+    mkdir -p "${etc}"
+
+    cat > "${etc}/os-release" <<EOF
+PRETTY_NAME="shirOS ${SHIROS_VERSION} (Shir)"
+NAME="shirOS"
+VERSION_ID="${SHIROS_VERSION}"
+VERSION="${SHIROS_VERSION} (Shir)"
+VERSION_CODENAME=shir
+ID=shiros
+ID_LIKE=debian
+HOME_URL="https://github.com/ianpolettilucero/shiros"
+SUPPORT_URL="https://github.com/ianpolettilucero/shiros/issues"
+BUG_REPORT_URL="https://github.com/ianpolettilucero/shiros/issues"
+LOGO=shiros-logo
+EOF
+
+    cat > "${etc}/lsb-release" <<EOF
+DISTRIB_ID=shirOS
+DISTRIB_RELEASE=${SHIROS_VERSION}
+DISTRIB_CODENAME=shir
+DISTRIB_DESCRIPTION="shirOS ${SHIROS_VERSION} (Shir)"
+EOF
+
+    cat > "${etc}/issue" <<EOF
+shirOS ${SHIROS_VERSION} \\n \\l
+
+EOF
+    cp "${etc}/issue" "${etc}/issue.net"
 }
 
 ensure_rustdesk_deb() {
@@ -185,6 +222,7 @@ require_root
 check_dependencies
 check_disk_space
 ensure_scripts_executable
+generate_version_files
 ensure_rustdesk_deb
 clean_build
 run_build
