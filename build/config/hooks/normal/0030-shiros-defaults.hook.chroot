@@ -33,14 +33,25 @@ ICON_NAME=computer-laptop
 CHASSIS=laptop
 EOF
 
-# Credenciales y sudo del user 'live' los maneja al boot
-#   /lib/live/config/9999-shiros-credentials
-# (corre después de que live-config creó al usuario, ahí ya existe).
-# El autologin de LightDM lo maneja
-#   /etc/lightdm/lightdm.conf.d/50-shiros-autologin.conf
+# Credenciales y permisos del user 'live' se setean en build time vía
+#   build/config/hooks/normal/0005-create-live-user.hook.chroot
+# (no más mecanismos runtime — bug live-config en trixie hacía esto frágil).
+# Autologin de LightDM lo maneja
+#   /etc/lightdm/lightdm.conf.d/50-shiros-autologin.conf (static).
 
 # Asegurar que los scripts custom son ejecutables
 chmod +x /usr/bin/shiros-* 2>/dev/null || true
 
 # Crear dir de config de shirOS
 mkdir -p /etc/skel/.config/shiros
+
+# Ocultar el "Install Debian" launcher de calamares-settings-debian.
+# Tenemos nuestro propio install-shiros.desktop. Tener los dos confunde.
+# Usamos NoDisplay=true en vez de borrar el archivo así seguís pudiendo
+# correr `calamares` a mano si hace falta debugging.
+if [ -f /usr/share/applications/install-debian.desktop ]; then
+    if ! grep -q '^NoDisplay=true' /usr/share/applications/install-debian.desktop; then
+        echo "NoDisplay=true" >> /usr/share/applications/install-debian.desktop
+        echo "I: install-debian.desktop ocultado del menú"
+    fi
+fi

@@ -1,13 +1,15 @@
 # shirOS — user-facing applications
 # Browser, mail, editor, viewers, basic productivity.
 
-# Browser principal — Falkon (QtWebEngine = mismo engine que Chromium,
-# soporta toda la web moderna: Gmail, Office365, Teams, AutoCAD Web, etc).
-# Mucho más liviano que Firefox ESR: ~50 MB vs ~120 MB instalado,
-# ~200 MB vs ~400 MB RAM idle.
-# Si el user necesita Firefox por extensiones específicas, instalable
-# después desde gnome-software.
-falkon
+# Browser principal — Chromium.
+# Es el mismo engine (Chromium/Blink) que Falkon pero mucho mejor optimizado:
+# JIT más rápido, UI más fluida, página de inicio + sync más usables.
+# Comparado con firefox-esr: ~150 MB vs ~120 MB (similar instalado) pero
+# ~300 MB vs ~400 MB RAM idle. Sin telemetría de Google (versión Debian
+# es 100% open-source, sin Google services baked in).
+# Si el user quiere Firefox: gnome-software ofrece firefox-esr.
+chromium
+chromium-l10n
 
 # Mail: NO instalado por default — la mayoría usa webmail (Gmail/Outlook
 # vía web). Si hace falta cliente nativo, gnome-software ofrece
@@ -34,8 +36,11 @@ system-config-printer
 cups
 cups-browsed
 printer-driver-all
+# hplip provee drivers de impresoras HP + utilidades CLI.
+# hplip-gui está OUT: agregaba un systray autoarrancable (hplip-systray.desktop)
+# que aparecía aunque no haya impresoras HP conectadas. Quien lo necesite:
+#   sudo apt install hplip-gui
 hplip
-hplip-gui
 sane
 sane-utils
 simple-scan

@@ -1,0 +1,28 @@
+#!/bin/bash
+# shirOS — WhatsApp Web con perfil aislado (multi-instancia).
+#
+# Cada perfil tiene su propia sesión / cookies / login, así podés tener
+# WhatsApp work, personal, etc. abiertos al mismo tiempo.
+#
+# Uso:
+#   shiros-whatsapp                  → perfil "default"
+#   shiros-whatsapp trabajo          → perfil "trabajo"
+#   shiros-whatsapp personal         → perfil "personal"
+#   shiros-whatsapp empresa2         → cualquier nombre
+#
+# El truco: chromium --user-data-dir crea un browser context aislado
+# por carpeta. Es como tener un Chrome instalado por separado, con su
+# propio login de WhatsApp.
+
+set -euo pipefail
+
+PROFILE="${1:-default}"
+PROFILE_DIR="${HOME}/.config/shiros-webapps/whatsapp-${PROFILE}"
+mkdir -p "${PROFILE_DIR}"
+
+exec chromium \
+    --user-data-dir="${PROFILE_DIR}" \
+    --class="WhatsApp-${PROFILE}" \
+    --window-name="WhatsApp (${PROFILE})" \
+    --app="https://web.whatsapp.com" \
+    2>/dev/null

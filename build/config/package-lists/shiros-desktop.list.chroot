@@ -23,6 +23,10 @@ xfdesktop4
 xfce4-appfinder
 xfce4-notifyd
 xfce4-power-manager
+# Plugin de batería dedicado para el panel (más informativo que el
+# tray icon del power-manager). Usuario lo agrega con:
+#   right-click panel → Panel → Add New Items → "Battery Monitor"
+xfce4-battery-plugin
 light-locker
 xfce4-screenshooter
 xfce4-taskmanager

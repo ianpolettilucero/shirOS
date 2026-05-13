@@ -28,6 +28,11 @@ openvpn
 openconnect
 wpasupplicant
 iwd
+# WiFi utilities — rfkill para unblock al boot, iw/wireless-tools/wpa
+# para diagnóstico (`iw dev`, `iwconfig`, `rfkill list`).
+rfkill
+iw
+wireless-tools
 avahi-daemon
 libnss-mdns
 openssh-client

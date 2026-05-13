@@ -1,0 +1,12 @@
+# shirOS — pin de firmware desde bookworm-backports.
+#
+# El firmware en bookworm es de feb 2023. Cards Intel modernas (AX 200,
+# AX 210, AX 211, AX 411, Be 200) y muchas Realtek/Atheros recientes
+# necesitan firmware más nuevo que sí está en bookworm-backports.
+#
+# Sin este pin, en bare metal con hardware 2023+ la WiFi falla aunque
+# en VM funcione (las VMs usan virtio-net, no WiFi real).
+
+Package: firmware-iwlwifi firmware-iwlwifi-* firmware-realtek firmware-realtek-* firmware-atheros firmware-brcm80211 firmware-misc-nonfree firmware-linux firmware-linux-nonfree firmware-sof-signed firmware-amd-graphics intel-microcode amd64-microcode
+Pin: release a=bookworm-backports
+Pin-Priority: 990
