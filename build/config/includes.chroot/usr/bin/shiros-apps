@@ -18,6 +18,8 @@ set -euo pipefail
 APPS=(
     "project|ProjectLibre — editor .mpp nativo, alternativa a MS Project|dpkg -s projectlibre|sudo /usr/bin/shiros-install-project"
     "wine|Wine + Bottles — correr aplicaciones Windows (.exe)|dpkg -s wine|sudo /usr/bin/shiros-install-wine"
+    "cad|AutoCAD local — bottle Wine pre-configurado para AutoCAD nativo|test -d /home/live/.local/share/wineprefixes/shiros-autocad|sudo /usr/bin/shiros-install-cad"
+    "msproject|MS Project local — bottle Wine pre-configurado para Project nativo|test -d /home/live/.local/share/wineprefixes/shiros-msproject|sudo /usr/bin/shiros-install-msproject"
     "comms|Teams + Outlook + WhatsApp nativos (Flatpak)|flatpak list --app | grep -q teams-for-linux|sudo /usr/bin/shiros-install-comms"
     "firefox|Firefox ESR — browser alternativo|dpkg -s firefox-esr|sudo apt install -y firefox-esr firefox-esr-l10n-es-ar"
     "thunderbird|Thunderbird — cliente de mail nativo|dpkg -s thunderbird|sudo apt install -y thunderbird thunderbird-l10n-es-ar"

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Conectar a WiFi
+GenericName=Configuración de red
+Comment=Listar redes WiFi cercanas y conectarse
+Exec=nm-connection-editor
+Icon=network-wireless
+Terminal=false
+StartupNotify=true
+Categories=Network;Settings;
+Keywords=wifi;wireless;red;internet;conectar;

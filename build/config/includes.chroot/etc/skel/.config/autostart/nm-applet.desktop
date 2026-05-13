@@ -3,7 +3,11 @@ Type=Application
 Name=Network
 GenericName=NetworkManager applet
 Comment=Gestor de redes WiFi y cableadas (ícono en bandeja)
-Exec=nm-applet
+# Esperamos 3s para que NetworkManager y DBus estén bien arriba antes
+# de lanzar nm-applet. Sin esto, en algunas máquinas nm-applet arranca
+# muy temprano, no encuentra NM, sale sin mostrar ícono. Resultado:
+# panel sin ícono de WiFi pese a que el autostart "corrió".
+Exec=sh -c 'sleep 3 && exec nm-applet'
 Icon=network-workgroup
 Terminal=false
 Categories=Network;

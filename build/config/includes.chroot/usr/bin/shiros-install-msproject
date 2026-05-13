@@ -1,0 +1,98 @@
+#!/bin/bash
+# shirOS — instalador de Microsoft Project nativo (vía Wine).
+#
+# Project no tiene cliente nativo Linux. Como AutoCAD, lo corremos en
+# Wine con un bottle pre-configurado.
+#
+# Versiones soportadas (rating de WineHQ):
+#   - Project 2010: Platinum.
+#   - Project 2013: Gold.
+#   - Project 2016: Silver — anda con tweaks.
+#   - Project 2019/2021: Bronze. Parcial.
+#   - Project 365 / 2024: usá Project for the Web mejor.
+
+set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Este script requiere sudo. Probá: sudo shiros-install-msproject"
+    exit 1
+fi
+
+cat <<'EOF'
+shirOS — Setup local de MS Project (vía Wine)
+─────────────────────────────────────────────────────────────
+Esto va a instalar:
+  - Wine + Wine32 (deps base, ~600 MB)
+  - winetricks (helper de runtimes)
+  - Un bottle "shiros-msproject" pre-configurado con:
+      .NET Framework 4.8
+      VC++ Redistributables (2015-2022)
+      MSXML 6
+      corefonts
+      riched20 (rich text edit, Project lo usa)
+
+Espacio total: ~2 GB.
+
+IMPORTANTE:
+  - Versiones recomendadas: Project 2010, 2013 (Wine las soporta full).
+  - Project 2024 / 365: usá Project for the Web (icono en menú).
+  - ProjectLibre es alternativa NATIVA Linux que abre .mpp — instalable con:
+       sudo shiros-install-project
+  - El .exe / instalador de Project lo bajás vos.
+
+EOF
+
+read -rp "Continuar? [y/N]: " ans
+case "${ans}" in
+    y|Y|yes|YES) ;;
+    *) echo "Cancelado."; exit 0 ;;
+esac
+
+LIVE_USER="${SUDO_USER:-live}"
+WINE_PREFIX="/home/${LIVE_USER}/.local/share/wineprefixes/shiros-msproject"
+
+echo
+echo "[1/4] Habilitando arquitectura i386..."
+dpkg --add-architecture i386
+apt update
+
+echo
+echo "[2/4] Instalando Wine + winetricks..."
+apt install -y wine wine32 wine64 winetricks winbind cabextract
+
+echo
+echo "[3/4] Creando bottle 'shiros-msproject' como user '${LIVE_USER}'..."
+sudo -u "${LIVE_USER}" mkdir -p "${WINE_PREFIX}"
+sudo -u "${LIVE_USER}" WINEPREFIX="${WINE_PREFIX}" WINEARCH=win64 wineboot --init
+
+echo
+echo "[4/4] Instalando runtimes en el bottle (esto tarda ~10 min)..."
+sudo -u "${LIVE_USER}" WINEPREFIX="${WINE_PREFIX}" winetricks --unattended \
+    dotnet48 \
+    vcrun2015 \
+    vcrun2017 \
+    vcrun2019 \
+    vcrun2022 \
+    msxml6 \
+    riched20 \
+    corefonts \
+    fontsmooth=rgb
+
+echo
+cat <<EOF
+
+──────────────────────────────────────────────────────────────
+Entorno listo. Próximos pasos:
+
+  1. Bajá tu instalador de Project (.exe / .iso) a /home/${LIVE_USER}/Downloads/
+  2. Si es .exe directo:
+       WINEPREFIX="${WINE_PREFIX}" wine /home/${LIVE_USER}/Downloads/setup.exe
+  3. Si es .iso:
+       sudo mount -o loop Project.iso /mnt
+       WINEPREFIX="${WINE_PREFIX}" wine /mnt/setup.exe
+  4. Para lanzar Project después de instalar:
+       WINEPREFIX="${WINE_PREFIX}" wine '${WINE_PREFIX}/drive_c/Program Files/Microsoft Office/Office15/WINPROJ.EXE'
+     (el path exacto cambia según versión).
+
+──────────────────────────────────────────────────────────────
+EOF
