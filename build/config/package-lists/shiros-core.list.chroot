@@ -24,10 +24,18 @@ dbus
 #   en disco/SSD, alivia presión de memoria sin tocar el SSD).
 # tlp: power management automático para laptops — alarga batería, baja
 #   temperaturas y throttling cuando el laptop está en batería.
+# ananicy: auto-nice de procesos — sube prioridad de UI/foreground
+#   (Xorg, xfwm4) y baja la de background (compilers, indexers).
+#   Hace que el SO se sienta "fluido" en máquinas con poca CPU.
+# irqbalance: distribuye interrupciones de hardware entre cores. En
+#   multi-core lo aprovecha el SO automáticamente; mejora responsiveness
+#   sobre todo en máquinas con WiFi/USB activos.
 earlyoom
 zram-tools
 tlp
 tlp-rdw
+ananicy
+irqbalance
 
 # networking
 network-manager

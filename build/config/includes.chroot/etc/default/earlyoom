@@ -1,17 +1,18 @@
-# shirOS — config de earlyoom.
+# shirOS — config de earlyoom (graduated kill thresholds).
 #
-# Triggers que kill the biggest memory hog:
-#   -m 5     → MemAvailable cae por debajo del 5% (~200 MB en sistema de 4 GB)
-#   -s 90    → swap usage sube por encima del 90%
-#   -r 60    → log status cada 60s a journald (sin spam)
-#   -n       → notifica al user vía wall msg cuando mata algo
+# Sintaxis -m PERCENT,KILL_PERCENT y -s PERCENT,KILL_PERCENT:
+#   PERCENT      → manda SIGTERM (aviso, deja al app cleanup)
+#   KILL_PERCENT → manda SIGKILL (mata sin remedio, último recurso)
 #
-# --avoid: procesos que NO se matan jamás (system core).
-# --prefer: procesos que se matan PRIMERO si hay tie. Apps user-facing
-#          que típicamente son los memory hogs.
+# Política:
+#   -m 10,5  → SIGTERM cuando MemAvailable cae al 10% (en 4 GB = 400 MB libre)
+#               SIGKILL cuando cae al 5% (último recurso para evitar hang)
+#   -s 80,90 → SIGTERM cuando swap está al 80%
+#               SIGKILL cuando swap está al 90%
+#   -r 600   → log status cada 10 min (sin spam en journald)
+#   -n       → wall message al user cuando mata algo (que sepa por qué cerró)
 #
-# Política total: si un Chromium con 50 tabs te come la RAM, earlyoom
-# mata Chromium antes que el SO se cuelgue. Perdés las tabs (lo cual
-# Chromium recupera con "Restore tabs"), pero el SO queda responsive.
+# --avoid: procesos críticos del SO/sesión — NUNCA matar.
+# --prefer: memory hogs típicos — preferir matar estos primero.
 
-EARLYOOM_ARGS="-m 5 -s 90 -r 60 -n --avoid '(^|/)(systemd|init|sshd|Xorg|lightdm|NetworkManager|dbus-daemon|pulseaudio|wireplumber|pipewire|xfce4-session|xfce4-panel|xfwm4)$' --prefer '(^|/)(chromium|firefox|firefox-esr|thunderbird|libreoffice|java|teams-for-linux|electron|node|wine)$'"
+EARLYOOM_ARGS="-m 10,5 -s 80,90 -r 600 -n --avoid '(^|/)(systemd|init|sshd|Xorg|lightdm|NetworkManager|dbus-daemon|pulseaudio|wireplumber|pipewire|xfce4-session|xfce4-panel|xfwm4)$' --prefer '(^|/)(chromium|chrome|firefox|firefox-esr|thunderbird|libreoffice|java|teams-for-linux|electron|node|wine)$'"

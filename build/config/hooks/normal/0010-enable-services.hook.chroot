@@ -43,10 +43,19 @@ systemctl enable shiros-rfkill-unblock.service || true
 
 # Salvaguardas de memoria — críticas para evitar que el SO se cuelgue
 # cuando un app (Chromium con muchas tabs, etc.) come toda la RAM.
-# earlyoom: mata el proceso más pesado cuando RAM libre < 5% o swap > 90%.
+# earlyoom: SIGTERM al 10% RAM, SIGKILL al 5% (graduated, ver
+#           /etc/default/earlyoom).
 # zramswap: comprime swap en RAM con zstd (ALGO=zstd, PERCENT=50).
 systemctl enable earlyoom.service || true
 systemctl enable zramswap.service || true
+
+# Responsiveness — para que el SO se sienta fluido aún en máquinas
+# con poca CPU/RAM:
+# ananicy: auto-nice de procesos (UI tiene prioridad alta, background
+#          tiene prioridad baja).
+# irqbalance: distribuye interrupciones entre cores.
+systemctl enable ananicy.service || true
+systemctl enable irqbalance.service || true
 
 # TLP — power management para laptops. En desktops no hace daño,
 # detecta el tipo de hardware solo.
