@@ -27,6 +27,10 @@ xfce4-power-manager
 # tray icon del power-manager). Usuario lo agrega con:
 #   right-click panel → Panel → Add New Items → "Battery Monitor"
 xfce4-battery-plugin
+# Status Notifier plugin: API moderno que apps como nm-applet, blueman,
+# Telegram, etc. usan para ícono en el panel. Sin este plugin, varias
+# apps no muestran su ícono pese a estar corriendo.
+xfce4-statusnotifier-plugin
 light-locker
 xfce4-screenshooter
 xfce4-taskmanager

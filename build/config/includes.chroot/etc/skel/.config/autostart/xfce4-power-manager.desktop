@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Power Manager
+GenericName=XFCE Power Manager
+Comment=Gestión de energía y batería (ícono en bandeja con %)
+Exec=xfce4-power-manager
+Icon=xfpm-ac-adapter
+Terminal=false
+Categories=System;
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true

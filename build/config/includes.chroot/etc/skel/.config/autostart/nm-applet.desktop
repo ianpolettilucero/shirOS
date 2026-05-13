@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Network
+GenericName=NetworkManager applet
+Comment=Gestor de redes WiFi y cableadas (ícono en bandeja)
+Exec=nm-applet
+Icon=network-workgroup
+Terminal=false
+Categories=Network;
+NotShowIn=KDE;
+X-GNOME-Autostart-enabled=true
+X-XFCE-Autostart-Override=true

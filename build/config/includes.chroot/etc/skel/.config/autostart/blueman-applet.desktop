@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Bluetooth Manager
+GenericName=Blueman applet
+Comment=Gestor de Bluetooth (ícono en bandeja)
+Exec=blueman-applet
+Icon=blueman
+Terminal=false
+Categories=Network;
+NotShowIn=KDE;
+X-GNOME-Autostart-enabled=true
