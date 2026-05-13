@@ -1,0 +1,74 @@
+#!/bin/sh
+# shirOS — pre-creación del user 'live' en build time.
+#
+# Por qué no dejamos esto a live-config:
+#   - Bug #1094353 (Debian): live-config en trixie tiene el autologin
+#     roto con LightDM/Plasma 6. La regression llega también al setup de
+#     usuarios — el password termina vacío o el user en estado raro.
+#   - Crear el user en build time hace el resultado determinístico,
+#     debugeable, y no depende del proceso de boot.
+#
+# live-config al boot ve que el user ya existe (chequea con `id`) y
+# salta el paso de creación. Solo aplica configs (groups, etc.).
+# Para que tampoco lo toque, en auto/config el bootappend tiene
+# live-config.nox11autologin.
+
+set -e
+
+echo "I: shirOS — pre-creando user 'live' en chroot"
+
+# 1. Crear el user (si live-config ya lo creó por alguna razón, no-op)
+if ! id -u live >/dev/null 2>&1; then
+    useradd \
+        --create-home \
+        --uid 1000 \
+        --shell /bin/bash \
+        --comment "shirOS Live User" \
+        --groups sudo,audio,video,cdrom,dip,plugdev,netdev,scanner,lpadmin,bluetooth \
+        live
+    echo "I: user 'live' creado con UID 1000"
+fi
+
+# 2. Password 'live' (defense in depth — el autologin no lo necesita,
+#    pero si alguien cae al greeter o a TTY, funciona)
+echo 'live:live' | chpasswd
+echo "I: password de 'live' = 'live'"
+
+# 3. Root password 'root' (acceso de emergencia + rescue tty3)
+echo 'root:root' | chpasswd
+# Por default el account root está locked en Debian (passwd -l); unlock:
+passwd -u root || true
+echo "I: password de 'root' = 'root', cuenta desbloqueada"
+
+# 4. Grupo nopasswdlogin (gate de PAM para lightdm-autologin)
+if ! getent group nopasswdlogin >/dev/null 2>&1; then
+    groupadd -r nopasswdlogin
+fi
+usermod -aG nopasswdlogin live
+echo "I: 'live' en grupo nopasswdlogin"
+
+# 5. Passwordless sudo (Calamares lo necesita)
+cat > /etc/sudoers.d/shiros-live <<'EOF'
+live ALL=(ALL) NOPASSWD: ALL
+EOF
+chmod 0440 /etc/sudoers.d/shiros-live
+echo "I: sudoers escrito"
+
+# 6. Hostname (live-config a veces le agrega "-live"; lo seteamos acá
+#    como default y un hook en runtime lo refuerza si hace falta)
+echo 'shiros' > /etc/hostname
+echo "I: hostname = shiros"
+
+# 7. Config para live-config: queremos que NO sobrescriba ni el password
+#    ni la config de autologin (esos vienen nuestros)
+mkdir -p /etc/live
+cat > /etc/live/config.conf.d/00-shiros.conf <<'EOF'
+# shirOS — defaults para live-config.
+# Si live-config corre algún script de user/autologin, que use estos
+# valores en vez de sus defaults (que rompen en trixie por el bug 1094353).
+LIVE_USERNAME="live"
+LIVE_USER_FULLNAME="shirOS Live User"
+LIVE_USER_DEFAULT_PASSWORD="live"
+LIVE_HOSTNAME="shiros"
+EOF
+echo "I: /etc/live/config.conf.d/00-shiros.conf escrito"

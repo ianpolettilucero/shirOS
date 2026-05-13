@@ -31,11 +31,10 @@ systemctl enable apt-daily-upgrade.timer || true
 # Time sync (systemd-timesyncd vive en su propio paquete desde bookworm).
 systemctl enable systemd-timesyncd.service || true
 
-# Backup de inicialización del user live — fallback por si live-config en
-# trixie no procesa /lib/live/config/9999-shiros-credentials. La unit tiene
-# ConditionKernelCommandLine=boot=live, así que en el sistema instalado
-# no hace nada.
-systemctl enable shiros-live-init.service || true
+# TTY3 de rescate (autologin a root, solo en live boot).
+# Para acceder: en QEMU usar Machine → Send Key → Ctrl+Alt+F3, o bare
+# metal Ctrl+Alt+F3. Para volver a la GUI: F7 (default LightDM VT).
+systemctl enable getty@tty3.service || true
 
 # ClamAV (decisión 0003: scan semanal Lunes 9 AM, low priority)
 # NO habilitamos clamav-daemon (clamd) — sería on-access scan, demasiado pesado.
