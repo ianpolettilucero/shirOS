@@ -1,0 +1,63 @@
+#!/bin/sh
+# shirOS — instalar kernel + firmware de bookworm-backports.
+#
+# Razón: el kernel de bookworm-stable es 6.1, que NO incluye el driver
+# rtw89_8852be requerido para Realtek RTL8852BE (común en Lenovo IdeaPad
+# 2022+) ni para muchos otros WiFi modernos. Diagnosticado en v0.1.14
+# con output del rescue tty3: el módulo cargado era rtw89_8852ae (chip
+# A) que no matcheaba el dispositivo BE → ningún interface wlan*.
+#
+# Por qué no usamos --linux-flavours backports/amd64: live-build no
+# soporta especificar el suite por flag. Y el apt pin a backports en
+# /etc/apt/preferences.d/ no garantiza efecto durante install pass
+# inicial (timing del includes copy vs install).
+#
+# Solución reliable: este hook corre DESPUÉS del install inicial de
+# package-lists/*.list.chroot (donde se instaló kernel 6.1 de stable)
+# y reemplaza explícitamente con `apt-get install -t bookworm-backports`,
+# que es la forma oficial Debian de force-suite. Después limpia los
+# rastros del 6.1 para mantener la ISO ordenada.
+#
+# Side-effect bonus: hardware support 2023+ mucho más amplio
+# (Intel AX 211/BE 200, MediaTek MT7921/7922, trackpads modernos, etc.).
+
+set -e
+
+echo "I: shirOS — installing backports kernel for modern hardware support"
+
+# Refresh apt cache para que vea backports
+apt-get update
+
+# Forzar install de backports kernel + headers + firmware
+# `-t bookworm-backports` = oficial Debian way de target-release.
+apt-get install -y -t bookworm-backports \
+    linux-image-amd64 \
+    linux-headers-amd64 \
+    firmware-realtek \
+    firmware-iwlwifi \
+    firmware-atheros \
+    firmware-brcm80211 \
+    firmware-libertas \
+    firmware-misc-nonfree \
+    firmware-ralink \
+    firmware-zd1211 \
+    firmware-linux \
+    firmware-linux-nonfree \
+    firmware-amd-graphics \
+    firmware-sof-signed \
+    intel-microcode \
+    amd64-microcode
+
+# Limpiar el kernel 6.1 stable (ya no necesario, ahorra ~100 MB en ISO).
+# Hacemos esto en dos pasos: primero remove de las versiones específicas,
+# después autoremove de orphans.
+for pkg in $(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -E '^linux-(image|headers)-6\.1\.[0-9]+-[0-9]+-amd64$' || true); do
+    echo "I: purging old stable kernel package: ${pkg}"
+    apt-get purge -y "${pkg}" || true
+done
+
+apt-get autoremove --purge -y || true
+
+# Verificación: dejá info en log para debugging post-build
+NEW_KERNEL=$(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -E '^linux-image-6\.[0-9]+\.[0-9]+-[0-9]+-amd64$' | head -1 || echo "NOT FOUND")
+echo "I: kernel post-hook: ${NEW_KERNEL}"
