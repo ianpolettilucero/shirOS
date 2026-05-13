@@ -1,12 +1,22 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=WhatsApp (Web)
-GenericName=WhatsApp
-Comment=WhatsApp Web
-Exec=chromium --new-window https://web.whatsapp.com
+Name=WhatsApp
+GenericName=WhatsApp Web
+Comment=WhatsApp Web (con soporte multi-cuenta — corré shiros-whatsapp NOMBRE para perfiles aislados)
+Exec=shiros-whatsapp default
 Icon=whatsapp
 Terminal=false
 StartupNotify=true
+StartupWMClass=WhatsApp-default
 Categories=Network;InstantMessaging;
 Keywords=whatsapp;chat;mensajes;
+Actions=Trabajo;Personal;
+
+[Desktop Action Trabajo]
+Name=WhatsApp Trabajo
+Exec=shiros-whatsapp trabajo
+
+[Desktop Action Personal]
+Name=WhatsApp Personal
+Exec=shiros-whatsapp personal

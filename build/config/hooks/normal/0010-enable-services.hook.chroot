@@ -36,6 +36,11 @@ systemctl enable systemd-timesyncd.service || true
 # metal Ctrl+Alt+F3. Para volver a la GUI: F7 (default LightDM VT).
 systemctl enable getty@tty3.service || true
 
+# rfkill unblock — para que WiFi/BT no queden bloqueados por estado
+# residual del BIOS en algunos laptops. Solo es un `rfkill unblock all`
+# de un shot al boot.
+systemctl enable shiros-rfkill-unblock.service || true
+
 # ClamAV (decisión 0003: scan semanal Lunes 9 AM, low priority)
 # NO habilitamos clamav-daemon (clamd) — sería on-access scan, demasiado pesado.
 # Solo freshclam (signature updates) y nuestro timer custom.

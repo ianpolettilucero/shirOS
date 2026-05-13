@@ -1,0 +1,128 @@
+#!/bin/bash
+# shirOS — gestor de apps opt-in.
+# Lista qué apps shirOS están disponibles para instalar y cuáles ya tenés.
+#
+# Uso:
+#   shiros-apps              — muestra ayuda
+#   shiros-apps list         — lista apps opt-in disponibles
+#   shiros-apps installed    — lista apps shirOS ya instaladas
+#   shiros-apps install NAME — instala una app opt-in
+#
+# Para agregar más apps al catálogo, editar la variable APPS abajo.
+
+set -euo pipefail
+
+# Catálogo: NAME|DESCRIPCIÓN|CHECK_CMD|INSTALL_CMD
+# - CHECK_CMD: cómo verificar que está instalada (returns 0 if installed)
+# - INSTALL_CMD: cómo instalarla (corre con sudo cuando hace falta)
+APPS=(
+    "project|ProjectLibre — editor .mpp nativo, alternativa a MS Project|dpkg -s projectlibre|sudo /usr/bin/shiros-install-project"
+    "wine|Wine + Bottles — correr aplicaciones Windows (.exe)|dpkg -s wine|sudo /usr/bin/shiros-install-wine"
+    "comms|Teams + Outlook + WhatsApp nativos (Flatpak)|flatpak list --app | grep -q teams-for-linux|sudo /usr/bin/shiros-install-comms"
+    "firefox|Firefox ESR — browser alternativo|dpkg -s firefox-esr|sudo apt install -y firefox-esr firefox-esr-l10n-es-ar"
+    "thunderbird|Thunderbird — cliente de mail nativo|dpkg -s thunderbird|sudo apt install -y thunderbird thunderbird-l10n-es-ar"
+    "libreoffice|LibreOffice — suite office completa (~500 MB)|dpkg -s libreoffice|sudo apt install -y libreoffice libreoffice-l10n-es"
+    "ganttproject|GanttProject — gestión de proyectos simple (alt a ProjectLibre)|dpkg -s ganttproject|sudo apt install -y ganttproject"
+    "cjk-fonts|Fonts asiáticos (chino/japonés/coreano)|dpkg -s fonts-noto-cjk|sudo apt install -y fonts-noto-cjk"
+    "cheese|Cheese — webcam test/captura|dpkg -s cheese|sudo apt install -y cheese"
+)
+
+C_BOLD=$'\033[1m'
+C_GREEN=$'\033[1;32m'
+C_DIM=$'\033[2m'
+C_RESET=$'\033[0m'
+
+is_installed() {
+    local check="$1"
+    eval "${check}" >/dev/null 2>&1
+}
+
+cmd_list() {
+    printf "${C_BOLD}Apps opt-in disponibles en shirOS:${C_RESET}\n\n"
+    printf "  %-14s %s\n" "NOMBRE" "DESCRIPCIÓN"
+    printf "  %-14s %s\n" "──────" "────────────"
+    for entry in "${APPS[@]}"; do
+        IFS='|' read -r name desc check _ <<< "${entry}"
+        if is_installed "${check}"; then
+            printf "  %-14s %s ${C_GREEN}[instalada]${C_RESET}\n" "${name}" "${desc}"
+        else
+            printf "  %-14s %s\n" "${name}" "${desc}"
+        fi
+    done
+    printf "\n${C_DIM}Para instalar una: shiros-apps install <nombre>${C_RESET}\n"
+}
+
+cmd_installed() {
+    printf "${C_BOLD}Apps shirOS instaladas en este sistema:${C_RESET}\n\n"
+    local any=0
+    for entry in "${APPS[@]}"; do
+        IFS='|' read -r name desc check _ <<< "${entry}"
+        if is_installed "${check}"; then
+            printf "  ${C_GREEN}✓${C_RESET} %-14s %s\n" "${name}" "${desc}"
+            any=1
+        fi
+    done
+    if [ "${any}" -eq 0 ]; then
+        printf "  ${C_DIM}(ninguna app opt-in instalada)${C_RESET}\n"
+    fi
+    printf "\n${C_DIM}Para ver todas las disponibles: shiros-apps list${C_RESET}\n"
+}
+
+cmd_install() {
+    local target="$1"
+    for entry in "${APPS[@]}"; do
+        IFS='|' read -r name desc check install <<< "${entry}"
+        if [ "${name}" = "${target}" ]; then
+            if is_installed "${check}"; then
+                printf "${C_GREEN}✓${C_RESET} '${name}' ya está instalada.\n"
+                exit 0
+            fi
+            printf "${C_BOLD}Instalando ${name}...${C_RESET}\n"
+            echo "  ${desc}"
+            echo "  comando: ${install}"
+            echo
+            exec ${install}
+        fi
+    done
+    printf "ERROR: app '${target}' no existe en el catálogo.\n" >&2
+    printf "Lista las disponibles con: shiros-apps list\n" >&2
+    exit 1
+}
+
+cmd_help() {
+    cat <<EOF
+${C_BOLD}shiros-apps${C_RESET} — gestor de apps opt-in de shirOS
+
+Uso:
+  shiros-apps list              Lista apps disponibles para instalar
+  shiros-apps installed         Lista apps shirOS ya instaladas
+  shiros-apps install NOMBRE    Instala una app por nombre
+  shiros-apps help              Esta ayuda
+
+Ejemplos:
+  shiros-apps list
+  shiros-apps install project
+  shiros-apps install firefox
+
+${C_DIM}Las apps opt-in NO están instaladas por default para mantener la ISO
+liviana. Instalá solo las que necesites.${C_RESET}
+EOF
+}
+
+case "${1:-help}" in
+    list)         cmd_list ;;
+    installed|i)  cmd_installed ;;
+    install)
+        if [ $# -lt 2 ]; then
+            echo "ERROR: falta el nombre. Uso: shiros-apps install NOMBRE" >&2
+            exit 1
+        fi
+        cmd_install "$2"
+        ;;
+    help|-h|--help) cmd_help ;;
+    *)
+        echo "ERROR: comando desconocido: $1" >&2
+        cmd_help >&2
+        exit 1
+        ;;
+esac

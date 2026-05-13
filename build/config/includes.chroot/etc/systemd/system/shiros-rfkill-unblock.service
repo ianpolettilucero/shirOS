@@ -1,0 +1,15 @@
+[Unit]
+Description=shirOS — desbloquear rfkill al boot (WiFi + Bluetooth)
+# Algunos laptops bootean con WiFi/BT en rfkill block (Fn+key state
+# guardada del BIOS). Lo desbloqueamos siempre — NetworkManager
+# después decide si conectar o no.
+After=systemd-modules-load.service
+Before=NetworkManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/rfkill unblock all
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
