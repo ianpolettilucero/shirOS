@@ -41,6 +41,17 @@ systemctl enable getty@tty3.service || true
 # de un shot al boot.
 systemctl enable shiros-rfkill-unblock.service || true
 
+# Salvaguardas de memoria — críticas para evitar que el SO se cuelgue
+# cuando un app (Chromium con muchas tabs, etc.) come toda la RAM.
+# earlyoom: mata el proceso más pesado cuando RAM libre < 5% o swap > 90%.
+# zramswap: comprime swap en RAM con zstd (ALGO=zstd, PERCENT=50).
+systemctl enable earlyoom.service || true
+systemctl enable zramswap.service || true
+
+# TLP — power management para laptops. En desktops no hace daño,
+# detecta el tipo de hardware solo.
+systemctl enable tlp.service || true
+
 # ClamAV (decisión 0003: scan semanal Lunes 9 AM, low priority)
 # NO habilitamos clamav-daemon (clamd) — sería on-access scan, demasiado pesado.
 # Solo freshclam (signature updates) y nuestro timer custom.

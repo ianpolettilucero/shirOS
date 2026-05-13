@@ -1,0 +1,28 @@
+{
+  "_comment": "shirOS defaults for Chromium. Policies in recommended/ are DEFAULTS — the user can change them. (managed/ would enforce them, that's too heavy-handed for a corporate-friendly OS.)",
+
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "Google",
+  "DefaultSearchProviderKeyword": "google.com",
+  "DefaultSearchProviderSearchURL": "https://www.google.com/search?q={searchTerms}",
+  "DefaultSearchProviderSuggestURL": "https://www.google.com/complete/search?output=chrome&q={searchTerms}",
+  "DefaultSearchProviderIconURL": "https://www.google.com/favicon.ico",
+
+  "HomepageLocation": "https://www.google.com",
+  "HomepageIsNewTabPage": false,
+  "NewTabPageLocation": "https://www.google.com",
+
+  "PasswordManagerEnabled": true,
+  "PasswordLeakDetectionEnabled": true,
+  "SafeBrowsingProtectionLevel": 1,
+
+  "BookmarkBarEnabled": true,
+  "EditBookmarksEnabled": true,
+  "ShowHomeButton": true,
+
+  "MetricsReportingEnabled": false,
+  "BlockThirdPartyCookies": false,
+
+  "BrowserSignin": 1,
+  "SyncDisabled": false
+}

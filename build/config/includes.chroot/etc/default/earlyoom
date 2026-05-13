@@ -1,0 +1,17 @@
+# shirOS — config de earlyoom.
+#
+# Triggers que kill the biggest memory hog:
+#   -m 5     → MemAvailable cae por debajo del 5% (~200 MB en sistema de 4 GB)
+#   -s 90    → swap usage sube por encima del 90%
+#   -r 60    → log status cada 60s a journald (sin spam)
+#   -n       → notifica al user vía wall msg cuando mata algo
+#
+# --avoid: procesos que NO se matan jamás (system core).
+# --prefer: procesos que se matan PRIMERO si hay tie. Apps user-facing
+#          que típicamente son los memory hogs.
+#
+# Política total: si un Chromium con 50 tabs te come la RAM, earlyoom
+# mata Chromium antes que el SO se cuelgue. Perdés las tabs (lo cual
+# Chromium recupera con "Restore tabs"), pero el SO queda responsive.
+
+EARLYOOM_ARGS="-m 5 -s 90 -r 60 -n --avoid '(^|/)(systemd|init|sshd|Xorg|lightdm|NetworkManager|dbus-daemon|pulseaudio|wireplumber|pipewire|xfce4-session|xfce4-panel|xfwm4)$' --prefer '(^|/)(chromium|firefox|firefox-esr|thunderbird|libreoffice|java|teams-for-linux|electron|node|wine)$'"
