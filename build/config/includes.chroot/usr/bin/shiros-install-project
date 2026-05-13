@@ -1,0 +1,63 @@
+#!/bin/bash
+# shirOS — instalador opt-in de ProjectLibre.
+# ProjectLibre: alternativa OSS a Microsoft Project. Abre/guarda .mpp,
+# 8.2M downloads en el mundo, mature y serio.
+#
+# NO se instala por default porque pesa ~30 MB + Java JRE (~150 MB).
+# Para corp users que NO necesiten editar .mpp en la PC, alternativas:
+#   - Project for the Web (browser): icono "Project for the Web" en menú
+#   - Tareas livianas: GanttProject (más simple, también opt-in)
+#
+# Uso:
+#   sudo shiros-install-project
+
+set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Este script requiere sudo. Probá: sudo shiros-install-project"
+    exit 1
+fi
+
+cat <<'EOF'
+shirOS — Instalador de ProjectLibre
+─────────────────────────────────────────────────────────────
+ProjectLibre — gestión de proyectos, alternativa OSS a MS Project.
+  - Abre y guarda archivos .mpp (formato Microsoft Project)
+  - Gantt charts, WBS, network diagrams, resource leveling
+  - Java-based, multiplataforma
+
+Esto va a instalar:
+  - default-jre (Java runtime, ~150 MB)
+  - projectlibre (~30 MB)
+
+Espacio total: ~180 MB.
+
+Para desinstalar después:
+  sudo apt purge projectlibre default-jre
+  sudo apt autoremove
+
+EOF
+
+read -rp "Continuar? [y/N]: " ans
+case "${ans}" in
+    y|Y|yes|YES) ;;
+    *) echo "Cancelado."; exit 0 ;;
+esac
+
+echo
+echo "[1/2] Instalando dependencias (Java + ProjectLibre)..."
+apt update
+apt install -y projectlibre
+
+echo
+echo "[2/2] Listo."
+cat <<'EOF'
+
+ProjectLibre instalado.
+
+Próximos pasos:
+  - Buscalo en el menú como "ProjectLibre" (sección Office).
+  - Abre archivos .mpp directamente.
+  - Documentación: https://projectlibre.com
+
+EOF

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Instalar Wine + Bottles
+GenericName=Compatibilidad Windows
+Comment=Para correr aplicaciones Windows nativas (apps viejas, instaladores .exe)
+Exec=xfce4-terminal --hold --title="Instalar Wine + Bottles" -e "sudo /usr/bin/shiros-install-wine"
+Icon=system-software-install
+Terminal=false
+StartupNotify=true
+Categories=System;Utility;
+Keywords=wine;windows;exe;bottles;compatibilidad;instalar;

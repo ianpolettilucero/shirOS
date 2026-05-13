@@ -4,7 +4,9 @@
 fonts-inter
 fonts-jetbrains-mono
 fonts-noto
-fonts-noto-cjk
+# fonts-noto-cjk: NO instalado por default (~150 MB, soporta chino/
+# japonés/coreano). Si el usuario lo necesita:
+#   sudo apt install fonts-noto-cjk
 fonts-noto-color-emoji
 fonts-noto-mono
 fonts-dejavu

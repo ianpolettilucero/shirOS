@@ -46,11 +46,10 @@ gnome-screenshot
 # Calculator
 galculator
 
-# Project management — alternativa nativa a MS Project.
-# Abre/guarda .mpp (Microsoft Project format) y .pod (su propio formato).
-# Java-based (~30 MB binario, pulls default-jre ~150 MB). Para usuarios
-# que no necesiten esto: removible con `apt purge projectlibre default-jre`.
-projectlibre
+# Project management — alternativas opt-in (NO instaladas por default
+# para mantener la ISO liviana). Para instalarlas:
+#   sudo shiros-install-project   → ProjectLibre (.mpp compat, nativo)
+#   o usar Project for the Web vía el shortcut del menú.
 
 # Soft store (para que el usuario instale apps extra)
 flatpak
@@ -66,8 +65,8 @@ timeshift
 # Calendar
 gnome-calendar
 
-# Webcam test
-cheese
+# Webcam test: NO instalado por default (niche). Si hace falta:
+#   sudo apt install cheese
 
 # Antivirus — exigido por compliance corporativo (decisión 0003).
 # Configurado como scan semanal Lunes 9 AM, low priority. NO on-access.
