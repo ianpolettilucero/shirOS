@@ -20,7 +20,7 @@ set -euo pipefail
 # Constantes
 # ─────────────────────────────────────────────────────────────
 
-SHIROS_VERSION="${SHIROS_VERSION:-0.1.16-shir}"
+SHIROS_VERSION="${SHIROS_VERSION:-0.1.17-shir}"
 SHIROS_ARCH="${SHIROS_ARCH:-amd64}"
 SHIROS_DIST="${SHIROS_DIST:-bookworm}"
 
@@ -126,6 +126,30 @@ EOF
     cp "${etc}/issue" "${etc}/issue.net"
 }
 
+prepare_branding() {
+    # Copia los assets de branding/ al chroot antes del build.
+    # Fuente: branding/wallpapers/*, branding/logo/*
+    # Destino en chroot:
+    #   /usr/share/backgrounds/shiros/*.svg
+    #   /usr/share/icons/shiros/*.svg
+    # El hook 0020-apply-branding después usa estos paths para configurar
+    # el wallpaper default de XFCE y el logo del menú.
+    # Los archivos en el chroot son COPIAS (gitignored) — la fuente sigue
+    # siendo branding/.
+    log "Preparando branding (copiando wallpapers/logos al chroot)..."
+
+    local chroot_bg="${BUILD_DIR}/config/includes.chroot/usr/share/backgrounds/shiros"
+    local chroot_icon="${BUILD_DIR}/config/includes.chroot/usr/share/icons/shiros"
+    mkdir -p "${chroot_bg}" "${chroot_icon}"
+
+    if [ -d "${REPO_ROOT}/branding/wallpapers" ]; then
+        cp -f "${REPO_ROOT}/branding/wallpapers/"*.svg "${chroot_bg}/" 2>/dev/null || true
+    fi
+    if [ -d "${REPO_ROOT}/branding/logo" ]; then
+        cp -f "${REPO_ROOT}/branding/logo/"*.svg "${chroot_icon}/" 2>/dev/null || true
+    fi
+}
+
 ensure_rustdesk_deb() {
     local pkg_dir="${BUILD_DIR}/config/packages.chroot"
     mkdir -p "${pkg_dir}"
@@ -223,6 +247,7 @@ check_dependencies
 check_disk_space
 ensure_scripts_executable
 generate_version_files
+prepare_branding
 ensure_rustdesk_deb
 clean_build
 run_build
