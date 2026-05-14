@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Instalar MS Project (local)
+GenericName=Microsoft Project nativo via Wine
+Comment=Prepara entorno Wine para correr Microsoft Project instalado localmente
+Exec=xfce4-terminal --hold --title="Instalar MS Project" -e "sudo /usr/bin/shiros-install-msproject"
+Icon=system-software-install
+Terminal=false
+StartupNotify=true
+Categories=Office;ProjectManagement;System;
+Keywords=project;ms;microsoft;gantt;instalar;wine;local;

@@ -15,6 +15,28 @@ systemd-sysv
 systemd-timesyncd
 dbus
 
+# Salvaguardas de sistema — críticas para que un app fugado de memoria
+# (Chromium con 50 tabs, electron mal portado, etc.) NO cuelgue el SO.
+# earlyoom: daemon en userspace que mata el proceso más pesado cuando
+#   RAM libre < threshold ANTES que el kernel OOM killer (que es lento
+#   y a veces no reacciona a tiempo).
+# zram-tools: comprime swap en RAM con zstd (mucho más rápido que swap
+#   en disco/SSD, alivia presión de memoria sin tocar el SSD).
+# tlp: power management automático para laptops — alarga batería, baja
+#   temperaturas y throttling cuando el laptop está en batería.
+# ananicy: auto-nice de procesos — sube prioridad de UI/foreground
+#   (Xorg, xfwm4) y baja la de background (compilers, indexers).
+#   Hace que el SO se sienta "fluido" en máquinas con poca CPU.
+# irqbalance: distribuye interrupciones de hardware entre cores. En
+#   multi-core lo aprovecha el SO automáticamente; mejora responsiveness
+#   sobre todo en máquinas con WiFi/USB activos.
+earlyoom
+zram-tools
+tlp
+tlp-rdw
+ananicy
+irqbalance
+
 # networking
 network-manager
 network-manager-gnome

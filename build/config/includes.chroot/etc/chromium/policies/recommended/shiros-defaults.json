@@ -1,0 +1,33 @@
+{
+  "_comment": "shirOS defaults para Chromium (recommended/, no managed/ — el user puede cambiar). Foco: search engine + memory saver agresivo para máquinas con poca RAM (~4 GB).",
+
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "Google",
+  "DefaultSearchProviderKeyword": "google.com",
+  "DefaultSearchProviderSearchURL": "https://www.google.com/search?q={searchTerms}",
+  "DefaultSearchProviderSuggestURL": "https://www.google.com/complete/search?output=chrome&q={searchTerms}",
+  "DefaultSearchProviderIconURL": "https://www.google.com/favicon.ico",
+
+  "HomepageLocation": "https://www.google.com",
+  "HomepageIsNewTabPage": false,
+  "NewTabPageLocation": "https://www.google.com",
+  "ShowHomeButton": true,
+
+  "_memory_saver_comment": "Descartar tabs idle automaticamente. Vital para 4 GB RAM. Chromium pone el chip 'inactivo' y restaura con un click.",
+  "HighEfficiencyModeEnabled": true,
+  "MemorySaverModeSavings": 2,
+  "BatterySaverModeAvailability": 1,
+
+  "_security_comment": "Password manager + Safe Browsing. Sin telemetria a Google.",
+  "PasswordManagerEnabled": true,
+  "PasswordLeakDetectionEnabled": true,
+  "SafeBrowsingProtectionLevel": 1,
+  "MetricsReportingEnabled": false,
+
+  "BookmarkBarEnabled": true,
+  "EditBookmarksEnabled": true,
+
+  "BrowserSignin": 1,
+  "SyncDisabled": false,
+  "BlockThirdPartyCookies": false
+}

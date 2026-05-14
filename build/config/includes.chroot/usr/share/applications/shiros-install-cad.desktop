@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Instalar AutoCAD (local)
+GenericName=AutoCAD nativo via Wine
+Comment=Prepara entorno Wine para correr AutoCAD instalado localmente
+Exec=xfce4-terminal --hold --title="Instalar AutoCAD" -e "sudo /usr/bin/shiros-install-cad"
+Icon=system-software-install
+Terminal=false
+StartupNotify=true
+Categories=Graphics;Engineering;System;
+Keywords=autocad;cad;dwg;dxf;instalar;wine;local;

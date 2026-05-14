@@ -1,9 +1,29 @@
 #!/bin/sh
-# shirOS — aplica branding (plymouth, GRUB defaults, alternatives).
+# shirOS — aplica branding (wallpaper, plymouth, GRUB, GTK).
 
 set -e
 
 echo "I: shirOS — applying branding"
+
+# Wallpaper default XFCE
+# Estrategia: sobrescribimos el SVG default de XFCE (xfce-shapes.svg)
+# con nuestro shiros-default.svg. xfdesktop4 lee el path desde su
+# config y muestra lo que esté ahí, así que cambiar el archivo es la
+# forma más simple de overrride sin tocar config XML per-monitor.
+# Los archivos shiros vienen del repo a través de prepare_branding()
+# en scripts/build-iso.sh.
+if [ -f /usr/share/backgrounds/shiros/shiros-default.svg ]; then
+    mkdir -p /usr/share/backgrounds/xfce
+    # Backup del original (por si alguien lo quiere recuperar)
+    if [ -f /usr/share/backgrounds/xfce/xfce-shapes.svg ] && \
+       [ ! -f /usr/share/backgrounds/xfce/xfce-shapes.svg.orig ]; then
+        mv /usr/share/backgrounds/xfce/xfce-shapes.svg \
+           /usr/share/backgrounds/xfce/xfce-shapes.svg.orig
+    fi
+    cp /usr/share/backgrounds/shiros/shiros-default.svg \
+       /usr/share/backgrounds/xfce/xfce-shapes.svg
+    echo "I: wallpaper shiros-default.svg copiado sobre xfce-shapes.svg"
+fi
 
 # Plymouth theme default
 if [ -d /usr/share/plymouth/themes/shiros ]; then
@@ -18,8 +38,9 @@ if [ -f /etc/default/grub ]; then
     sed -i 's|^GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"|' /etc/default/grub
 fi
 
-# Hostname default (será sobrescrito por el instalador)
-echo "shiros-live" > /etc/hostname
+# NOTA: el hostname lo setea hook 0005-create-live-user.hook.chroot
+# como "shiros". NO lo overrideamos acá. (Antes este hook ponía
+# "shiros-live" y rompía el setting del 0005 — fix de v0.1.17.)
 
 # Sound: PipeWire en lugar de PulseAudio
 systemctl --global enable pipewire.service pipewire-pulse.service wireplumber.service || true

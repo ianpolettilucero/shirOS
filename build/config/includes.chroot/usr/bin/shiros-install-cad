@@ -1,0 +1,109 @@
+#!/bin/bash
+# shirOS — instalador de AutoCAD nativo (vía Wine).
+#
+# AutoCAD no tiene cliente nativo Linux. Esta es la mejor opción local:
+# Wine + un bottle pre-configurado con todos los runtimes que AutoCAD
+# necesita (.NET 4.8, VC++ runtimes, MSXML, fonts, etc.).
+#
+# Versiones de AutoCAD soportadas:
+#   - AutoCAD 2017: Platinum en Wine — anda muy bien.
+#   - AutoCAD 2019: Gold — anda bien con tweaks menores.
+#   - AutoCAD 2020-2022: parcial. Algunos sub-módulos rompen.
+#   - AutoCAD 2024+: NO recomendado — usa AutoCAD Web mejor.
+#
+# Tu .exe del instalador tenés que conseguirlo aparte (Autodesk Account o
+# medio educativo). Este script SOLO prepara el entorno.
+
+set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Este script requiere sudo. Probá: sudo shiros-install-cad"
+    exit 1
+fi
+
+cat <<'EOF'
+shirOS — Setup local de AutoCAD (vía Wine)
+─────────────────────────────────────────────────────────────
+Esto va a instalar:
+  - Wine + Wine32 (deps base, ~600 MB)
+  - winetricks (helper de runtimes)
+  - Un bottle "shiros-autocad" pre-configurado con:
+      .NET Framework 4.8
+      VC++ Redistributables (2015, 2017, 2019, 2022)
+      MSXML 6
+      corefonts (Arial, Times, etc.)
+      d3dx9_43 (DirectX)
+
+Espacio total: ~2 GB (Wine + bottle).
+
+IMPORTANTE:
+  - AutoCAD modernos (2024+) tienen muchos problemas en Wine.
+    Para esas versiones usá AutoCAD Web (icono "AutoCAD Web" en el menú).
+  - El .exe del instalador AutoCAD NO está incluido — lo bajás vos
+    desde tu Autodesk Account.
+
+EOF
+
+read -rp "Continuar? [y/N]: " ans
+case "${ans}" in
+    y|Y|yes|YES) ;;
+    *) echo "Cancelado."; exit 0 ;;
+esac
+
+LIVE_USER="${SUDO_USER:-live}"
+WINE_PREFIX="/home/${LIVE_USER}/.local/share/wineprefixes/shiros-autocad"
+
+echo
+echo "[1/4] Habilitando arquitectura i386..."
+dpkg --add-architecture i386
+apt update
+
+echo
+echo "[2/4] Instalando Wine + winetricks..."
+apt install -y wine wine32 wine64 winetricks winbind cabextract
+
+echo
+echo "[3/4] Creando bottle 'shiros-autocad' como user '${LIVE_USER}'..."
+sudo -u "${LIVE_USER}" mkdir -p "${WINE_PREFIX}"
+
+# Setup del prefix con Wine 64-bit
+sudo -u "${LIVE_USER}" WINEPREFIX="${WINE_PREFIX}" WINEARCH=win64 wineboot --init
+
+echo
+echo "[4/4] Instalando runtimes en el bottle (esto tarda ~10 min)..."
+sudo -u "${LIVE_USER}" WINEPREFIX="${WINE_PREFIX}" winetricks --unattended \
+    dotnet48 \
+    vcrun2015 \
+    vcrun2017 \
+    vcrun2019 \
+    vcrun2022 \
+    msxml6 \
+    corefonts \
+    d3dx9_43 \
+    fontsmooth=rgb
+
+echo
+cat <<EOF
+
+──────────────────────────────────────────────────────────────
+Entorno listo. Próximos pasos:
+
+  1. Bajá tu instalador de AutoCAD (.exe) a /home/${LIVE_USER}/Downloads/
+  2. Corré el instalador con el prefix correcto:
+
+       WINEPREFIX="${WINE_PREFIX}" wine /home/${LIVE_USER}/Downloads/AutoCAD_Installer.exe
+
+  3. Seguí el wizard de Autodesk como en Windows.
+  4. Si el shortcut no aparece, lanzalo a mano:
+
+       WINEPREFIX="${WINE_PREFIX}" wine '${WINE_PREFIX}/drive_c/Program Files/Autodesk/AutoCAD ANIO/acad.exe'
+
+Si en algún paso falla:
+  - Activá DEBUG: WINEDEBUG=+all WINEPREFIX="${WINE_PREFIX}" wine ...
+  - Probá con Wine staging (más moderno) en lugar del estable:
+       sudo apt remove wine; sudo apt install wine-staging
+
+Para borrar el bottle y empezar de nuevo:
+       rm -rf "${WINE_PREFIX}"
+──────────────────────────────────────────────────────────────
+EOF

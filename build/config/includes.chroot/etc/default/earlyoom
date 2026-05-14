@@ -1,0 +1,18 @@
+# shirOS — config de earlyoom (graduated kill thresholds).
+#
+# Sintaxis -m PERCENT,KILL_PERCENT y -s PERCENT,KILL_PERCENT:
+#   PERCENT      → manda SIGTERM (aviso, deja al app cleanup)
+#   KILL_PERCENT → manda SIGKILL (mata sin remedio, último recurso)
+#
+# Política:
+#   -m 10,5  → SIGTERM cuando MemAvailable cae al 10% (en 4 GB = 400 MB libre)
+#               SIGKILL cuando cae al 5% (último recurso para evitar hang)
+#   -s 80,90 → SIGTERM cuando swap está al 80%
+#               SIGKILL cuando swap está al 90%
+#   -r 600   → log status cada 10 min (sin spam en journald)
+#   -n       → wall message al user cuando mata algo (que sepa por qué cerró)
+#
+# --avoid: procesos críticos del SO/sesión — NUNCA matar.
+# --prefer: memory hogs típicos — preferir matar estos primero.
+
+EARLYOOM_ARGS="-m 10,5 -s 80,90 -r 600 -n --avoid '(^|/)(systemd|init|sshd|Xorg|lightdm|NetworkManager|dbus-daemon|pulseaudio|wireplumber|pipewire|xfce4-session|xfce4-panel|xfwm4)$' --prefer '(^|/)(chromium|chrome|firefox|firefox-esr|thunderbird|libreoffice|java|teams-for-linux|electron|node|wine)$'"

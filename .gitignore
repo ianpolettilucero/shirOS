@@ -48,6 +48,11 @@ build/config/includes.chroot/etc/lsb-release
 build/config/includes.chroot/etc/issue
 build/config/includes.chroot/etc/issue.net
 
+# Branding assets — copiados desde branding/ por prepare_branding() en
+# cada build. La fuente de verdad sigue siendo branding/.
+build/config/includes.chroot/usr/share/backgrounds/shiros/
+build/config/includes.chroot/usr/share/icons/shiros/
+
 # Python (if scripts use venvs)
 __pycache__/
 *.pyc

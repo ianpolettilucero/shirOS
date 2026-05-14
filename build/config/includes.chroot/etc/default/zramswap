@@ -1,0 +1,18 @@
+# shirOS — config de zramswap.
+#
+# Crea un swap comprimido en RAM. La gracia: zstd comprime ~3x lo que
+# cuesta de tiempo CPU, así que efectivamente duplicás/triplicás la RAM
+# usable sin tocar el disco. En laptops modernos (con SSD) también
+# alarga la vida del disco.
+#
+# ALGO=zstd       → mejor compresión/speed que lz4 y mucho mejor que lzo
+# PERCENT=50      → hasta 50% de la RAM puede ser zram. Sweet spot:
+#                   más alto = más swap pero menos RAM "directa"; más
+#                   bajo = menos protección contra OOM.
+# PRIORITY=100    → mayor prioridad que swap en disco (si existe).
+#                   Linux usa zram primero, evita el disco.
+# SIZE=           → vacío. Si lo definís, override de PERCENT.
+
+ALGO=zstd
+PERCENT=50
+PRIORITY=100
