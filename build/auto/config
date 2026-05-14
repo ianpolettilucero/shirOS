@@ -31,7 +31,7 @@ lb config noauto \
     --iso-publisher "shirOS Project; https://github.com/ianpolettilucero/shiros" \
     --iso-volume "shirOS ${SHIROS_VERSION}" \
     --image-name "shiros-${SHIROS_VERSION}-${SHIROS_ARCH}" \
-    --bootappend-live "boot=live components live-config.username=live live-config.user-default-password=live live-config.hostname=shiros live-config.locales=es_AR.UTF-8 live-config.keyboard-layouts=latam live-config.timezone=America/Argentina/Buenos_Aires live-config.nox11autologin" \
+    --bootappend-live "boot=live components live-config.username=live live-config.user-default-password=live live-config.hostname=shiros live-config.locales=es_AR.UTF-8 live-config.keyboard-layouts=latam live-config.timezone=America/Argentina/Buenos_Aires live-config.nox11autologin nowatchdog nmi_watchdog=0" \
     --bootappend-live-failsafe "boot=live components noquiet noeject" \
     --firmware-binary true \
     --firmware-chroot true \
