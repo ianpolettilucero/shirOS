@@ -51,6 +51,15 @@ gnome-screenshot
 # Calculator
 galculator
 
+# Búsqueda de archivos — clave para usuarios que descargan/guardan en
+# cualquier lado y después no encuentran las cosas.
+# catfish: GUI XFCE-native para buscar files (Ctrl+F en thunar y aparte
+#          en menú como "Catfish File Search").
+# plocate: backend de locate (mucho más rápido que mlocate clásico).
+#          Indexa el disco diariamente via cron, búsquedas <1s.
+catfish
+plocate
+
 # Project management — alternativas opt-in (NO instaladas por default
 # para mantener la ISO liviana). Para instalarlas:
 #   sudo shiros-install-project   → ProjectLibre (.mpp compat, nativo)

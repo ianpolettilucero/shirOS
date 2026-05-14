@@ -1,23 +1,28 @@
 #!/bin/bash
 # shirOS — instalador opt-in de Teams + Outlook + WhatsApp nativos.
 #
-# Microsoft NO ofrece Teams ni Outlook nativos para Linux (Teams discontinuó
-# su Linux client en 2022). Las opciones realistas:
+# Microsoft NO ofrece Teams ni Outlook nativos para Linux (canceló el
+# Linux client en 2022). Opciones realistas:
+#   - Wrappers Electron mantenidos por comunidad (teams-for-linux)
+#   - Web wrappers via chromium --app (Outlook, WhatsApp multi-cuenta)
 #
-#   a) Wrappers Electron — la comunidad mantiene clones funcionales:
-#      - teams-for-linux (com.github.IsmaelMartinez.teams_for_linux):
-#        wrapper sólido, ~50k stars en GitHub, updates frecuentes.
-#      - Outlook PWA: el propio outlook.office.com tiene PWA install
-#        nativo en Chromium (botón en barra de URL).
-#   b) Chromium --app: lanzar la web app sin barras de browser, comportamiento
-#      tipo nativo. Es lo que usamos para WhatsApp.
-#
-# Este script instala (a) vía Flatpak + crea launchers (b) para Outlook.
+# Esta versión es más robusta que la previa — chequea cada paso y da
+# mensajes claros si algo falla, para que el user pueda accionar.
 
-set -euo pipefail
+set -uo pipefail   # NO usamos -e a propósito — queremos seguir aún si
+                   # algún paso falla, y dar el mejor diagnóstico posible.
+
+C_OK=$'\033[1;32m'
+C_ERR=$'\033[1;31m'
+C_WARN=$'\033[1;33m'
+C_RESET=$'\033[0m'
+
+ok()   { printf "${C_OK}✓${C_RESET} %s\n" "$*"; }
+err()  { printf "${C_ERR}✗${C_RESET} %s\n" "$*" >&2; }
+warn() { printf "${C_WARN}!${C_RESET} %s\n" "$*"; }
 
 if [ "$(id -u)" -ne 0 ]; then
-    echo "Este script requiere sudo. Probá: sudo shiros-install-comms"
+    err "Este script requiere sudo. Probá: sudo shiros-install-comms"
     exit 1
 fi
 
@@ -25,52 +30,97 @@ cat <<'EOF'
 shirOS — Instalador de Teams + Outlook + WhatsApp (nativos)
 ─────────────────────────────────────────────────────────────
 Esto va a instalar:
-  - teams-for-linux (Flatpak) — cliente nativo de Teams mantenido por
+  - teams-for-linux (Flatpak) — cliente nativo de Teams sostenido por
     la comunidad. Funciona con cuentas work/school de Microsoft.
-  - WhatsApp ya tiene multi-cuenta vía shiros-whatsapp (sin instalar nada).
-  - Outlook PWA — atajo de menú que abre outlook.office.com en modo app
-    (chromium --app, parece nativo). Ya está disponible: solo hay que
-    abrir Chromium → outlook.office.com → click en "Instalar app" (botón
-    en la barra de URL).
+  - El icono "WhatsApp" del menú ya soporta multi-cuenta sin instalar
+    nada (vía shiros-whatsapp NOMBRE_DE_PERFIL).
+  - Outlook: el atajo "Outlook (Web)" del menú apunta a outlook.office.com.
+    Si querés versión "app-like": abrí ese URL en Chromium → menú ⋮ →
+    "Cast, save and share" → "Install as app". Queda con su icono.
 
-Espacio aprox: ~500 MB (Flatpak + Teams + runtime).
-
-Después de instalar:
-  - Teams aparece en el menú como "Microsoft Teams".
-  - WhatsApp: corré `shiros-whatsapp trabajo` para una instancia
-    aislada, `shiros-whatsapp personal` para otra.
-  - Outlook: las opciones son
-    a) abrir el atajo "Outlook (Web)" del menú,
-    b) o desde Chromium en outlook.office.com → Install app.
+Espacio aprox: ~500 MB (Teams + Flatpak runtime).
 
 EOF
 
 read -rp "Continuar? [y/N]: " ans
 case "${ans}" in
-    y|Y|yes|YES) ;;
+    y|Y|yes|YES|s|S|si|SI) ;;
     *) echo "Cancelado."; exit 0 ;;
 esac
 
 echo
-echo "[1/3] Asegurando que Flatpak tenga el repo Flathub..."
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+# Paso 1: verificar flatpak
+echo "[1/4] Verificando que Flatpak esté instalado..."
+if ! command -v flatpak >/dev/null 2>&1; then
+    err "Flatpak no está instalado. Instalando..."
+    if ! apt-get update; then
+        err "apt-get update falló. ¿Tenés conexión a internet?"
+        exit 1
+    fi
+    if ! apt-get install -y flatpak; then
+        err "No se pudo instalar flatpak. Verificá tu conexión y volvé a probar."
+        exit 1
+    fi
+fi
+ok "Flatpak presente: $(flatpak --version | head -1)"
+
+# Paso 2: asegurar Flathub remote
+echo
+echo "[2/4] Verificando remote Flathub..."
+if flatpak remotes 2>/dev/null | grep -q '^flathub'; then
+    ok "Flathub remote ya configurado."
+else
+    warn "Flathub no configurado, agregando..."
+    if flatpak remote-add --if-not-exists flathub \
+            https://flathub.org/repo/flathub.flatpakrepo; then
+        ok "Flathub agregado system-wide."
+    else
+        err "No se pudo agregar Flathub. ¿Internet? ¿Proxy?"
+        echo "   Probá manualmente:"
+        echo "     sudo flatpak remote-add --if-not-exists flathub \\"
+        echo "       https://flathub.org/repo/flathub.flatpakrepo"
+        exit 1
+    fi
+fi
+
+# Paso 3: instalar Teams
+echo
+echo "[3/4] Instalando Microsoft Teams (cliente comunitario)..."
+echo "      Esto puede tardar 3-5 min (baja ~300 MB)..."
+if flatpak install -y --noninteractive flathub com.github.IsmaelMartinez.teams_for_linux; then
+    ok "Teams instalado."
+else
+    err "Teams falló al instalar. Posibles causas:"
+    echo "   - Conexión lenta o caída"
+    echo "   - Flathub está caído (raro pero pasa)"
+    echo "   - Espacio en disco (necesita ~500 MB libres)"
+    echo "   Reintentá con: sudo flatpak install flathub com.github.IsmaelMartinez.teams_for_linux"
+    exit 1
+fi
+
+# Paso 4: verificación final
+echo
+echo "[4/4] Verificación..."
+if flatpak list --app 2>/dev/null | grep -q teams-for-linux; then
+    ok "Teams aparece en la lista de apps Flatpak."
+else
+    warn "Teams instalado pero no aparece en flatpak list. Raro."
+fi
 
 echo
-echo "[2/3] Instalando Microsoft Teams (cliente comunitario)..."
-flatpak install -y --noninteractive flathub com.github.IsmaelMartinez.teams_for_linux
-
-echo
-echo "[3/3] Listo."
 cat <<'EOF'
-
+─────────────────────────────────────────────────────────────
 Instalación completada.
 
-Apps disponibles:
-  - "Microsoft Teams" en el menú (cliente Flatpak)
-  - "WhatsApp" en el menú (multi-cuenta via shiros-whatsapp NOMBRE)
-  - "Outlook (Web)" en el menú (apunta a outlook.office.com)
+Apps disponibles ahora:
+  - "Microsoft Teams" en el menú principal (Flatpak)
+  - "WhatsApp" en el menú — multi-cuenta vía:
+      shiros-whatsapp trabajo
+      shiros-whatsapp personal
+      etc.
+  - "Outlook (Web)" en el menú (outlook.office.com en Chromium)
 
 Para desinstalar Teams después:
   flatpak uninstall com.github.IsmaelMartinez.teams_for_linux
-
+─────────────────────────────────────────────────────────────
 EOF
