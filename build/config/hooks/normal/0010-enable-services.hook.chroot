@@ -13,6 +13,14 @@ systemctl enable lightdm.service
 systemctl enable NetworkManager.service
 systemctl enable wpa_supplicant.service || true
 
+# NetworkManager-wait-online.service: bloquea multi-user.target hasta
+# 90s esperando que haya internet. Útil para servers, INÚTIL para
+# desktops (el user prende la PC y abre apps de a poco — la red se
+# conecta de fondo, sin bloquear boot). Disabilitándolo ganamos
+# 30-90s de boot time en máquinas que no tienen WiFi auto-conectada.
+systemctl disable NetworkManager-wait-online.service 2>/dev/null || true
+systemctl mask NetworkManager-wait-online.service 2>/dev/null || true
+
 # Service discovery (impresoras, etc.)
 systemctl enable avahi-daemon.service
 

@@ -45,6 +45,18 @@ chmod +x /usr/bin/shiros-* 2>/dev/null || true
 # Crear dir de config de shirOS
 mkdir -p /etc/skel/.config/shiros
 
+# Pre-configurar Flathub como remote de Flatpak.
+# Sin esto, cuando el user intenta instalar un Flatpak (ej Teams via
+# shiros-install-comms, o cualquier app desde gnome-software) ve un
+# error "No remote configured" y no entiende qué hacer. Lo agregamos
+# al build, queda listo de fábrica.
+if command -v flatpak >/dev/null 2>&1; then
+    flatpak remote-add --if-not-exists flathub \
+        https://flathub.org/repo/flathub.flatpakrepo \
+        2>/dev/null || true
+    echo "I: Flathub remote configurado system-wide"
+fi
+
 # Ocultar el "Install Debian" launcher de calamares-settings-debian.
 # Tenemos nuestro propio install-shiros.desktop. Tener los dos confunde.
 # Usamos NoDisplay=true en vez de borrar el archivo así seguís pudiendo

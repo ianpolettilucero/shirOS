@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Buscar archivos
+GenericName=Búsqueda rápida de archivos
+Comment=Buscá cualquier archivo en tu PC. Útil cuando no recordás dónde guardaste algo.
+Exec=catfish
+Icon=system-search
+Terminal=false
+StartupNotify=true
+Categories=Utility;FileTools;Search;
+Keywords=buscar;archivo;file;search;encontrar;
