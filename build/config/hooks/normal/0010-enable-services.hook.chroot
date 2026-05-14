@@ -50,11 +50,10 @@ systemctl enable earlyoom.service || true
 systemctl enable zramswap.service || true
 
 # Responsiveness — para que el SO se sienta fluido aún en máquinas
-# con poca CPU/RAM:
-# ananicy: auto-nice de procesos (UI tiene prioridad alta, background
-#          tiene prioridad baja).
+# con poca CPU/RAM.
 # irqbalance: distribuye interrupciones entre cores.
-systemctl enable ananicy.service || true
+# (ananicy fue removido del package list — no está en bookworm; el
+#  CFS scheduler de Linux ya prioritiza apps interactivas solo.)
 systemctl enable irqbalance.service || true
 
 # TLP — power management para laptops. En desktops no hace daño,
